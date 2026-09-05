@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/api-gateway/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/api-gateway",
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "category": {
+      "type": "application",
+      "root": "apps/modules/category",
+      "entryFile": "main",
+      "sourceRoot": "apps/modules/category/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/modules/category/tsconfig.app.json"
+      }
+    },
+    "event-source-recovery": {
+      "type": "application",
+      "root": "apps/event-source-recovery",
+      "entryFile": "main",
+      "sourceRoot": "apps/event-source-recovery/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/event-source-recovery/tsconfig.app.json"
+      }
+    },
+    "product": {
+      "type": "application",
+      "root": "apps/modules/product",
+      "entryFile": "main",
+      "sourceRoot": "apps/modules/product/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/modules/product/tsconfig.app.json"
+      }
+    }
+  }
+}

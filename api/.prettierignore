@@ -1,0 +1,15 @@
+# Compiled output
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Test coverage directories
+coverage/
+
+# Lock files and system logs
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.log

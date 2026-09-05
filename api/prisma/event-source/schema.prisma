@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../generated/prisma/event-source"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LogType {
+  INFO
+  WARN
+  ERROR
+}
+
+model aggregates {
+  id        String      @id @db.Uuid
+  version   Int
+  events    events[]
+  snapshots snapshots[]
+}
+
+model events {
+  id                     String     @id @db.Uuid
+  aggregate_root_id      String     @db.Uuid
+  aggregate_root_version Int
+  aggregate_root_name    String
+  event_name             String
+  payload                Json
+  created_at             DateTime   @db.Timestamptz(6)
+  aggregates             aggregates @relation(fields: [aggregate_root_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "events_aggregate_root_id_foreign")
+}
+
+model snapshots {
+  id                     String     @id @db.Uuid
+  aggregate_root_id      String     @db.Uuid
+  aggregate_root_version Int
+  payload                Json
+  revision               Int
+  aggregates             aggregates @relation(fields: [aggregate_root_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "snapshots_aggregate_root_id_foreign")
+}
+
+model log {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  type           LogType
+  user_requested Json?
+  payload        Json
+  context        String   @db.VarChar(200)
+  file           String   @db.Text
+  func           String   @db.VarChar(200)
+  message        String   @db.Text
+  at             DateTime @db.Timestamptz(6)
+}
