@@ -1,14 +1,14 @@
-import { PrismaClient } from 'generated/prisma/event-source';
-import AsyncLogger from './async-logger';
-import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
 import { OnModuleDestroy } from '@nestjs/common';
+import { PrismaClient } from 'generated/prisma/event-source';
+import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
+import AsyncLogger from './async-logger';
 
 /**
  * Logging helper class.
  * @class
  */
 export default class AsyncLoggingService implements OnModuleDestroy {
-  private readonly loggers: Map<string, AsyncLogger> = new Map();
+  private readonly _loggers: Map<string, AsyncLogger> = new Map();
 
   /**
    * Logging system message.
@@ -28,17 +28,17 @@ export default class AsyncLoggingService implements OnModuleDestroy {
    * @returns {AsyncLogger} The async logger.
    */
   create(id: string, context: string, file: URL): void {
-    if (!this.loggers.has(id)) {
+    if (!this._loggers.has(id)) {
       const logger = new AsyncLogger(this.eventSourceDatabase, this.mailingService, context, file, {});
-      this.loggers.set(id, logger);
+      this._loggers.set(id, logger);
     }
   }
 
   getLogger(id: string): AsyncLogger | undefined {
-    return this.loggers.get(id);
+    return this._loggers.get(id);
   }
 
   onModuleDestroy() {
-    this.loggers.clear();
+    this._loggers.clear();
   }
 }

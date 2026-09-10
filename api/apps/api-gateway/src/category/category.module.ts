@@ -15,7 +15,7 @@ import MailModule from '@share/libs/mailer/mailer.module';
           return {
             transport: Transport.TCP,
             options: {
-              host: envService.NodeENV === 'docker' ? 'host.docker.internal' : envService.Localhost,
+              host: envService.ServiceHost.CATEGORY_MICROSERVICE_TCP_HOST,
               port: envService.Port.CATEGORY_MICROSERVICE_TCP_PORT,
             },
           };

@@ -9,6 +9,6 @@
 			"const currentFilePath = import.meta.url as URL;",
 			"$2",
 		],
-		"description": "Log output to console"
+		"description": "Log message to announce a reason I write this code."
 	}
 }

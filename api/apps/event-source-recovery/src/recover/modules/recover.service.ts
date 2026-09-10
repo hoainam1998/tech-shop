@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from 'generated/prisma/event-source';
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from 'generated/prisma/event-source';
 
 @Injectable()
 export default abstract class RecoverService {
@@ -24,18 +23,18 @@ export default abstract class RecoverService {
               AGGREGATE_ROOT_ID,
               T1.PAYLOAD
             FROM
-              EVENT_NEST_SCHEMA.SNAPSHOTS AS T1
+              EVENT_NEST.SNAPSHOTS AS T1
             WHERE
               T1.AGGREGATE_ROOT_VERSION = (
                 SELECT
                   MAX(T2.AGGREGATE_ROOT_VERSION)
                 FROM
-                  EVENT_NEST_SCHEMA.SNAPSHOTS AS T2
+                  EVENT_NEST.SNAPSHOTS AS T2
                 WHERE
                   T1.AGGREGATE_ROOT_ID = T2.AGGREGATE_ROOT_ID
               )
           ) AS T3
-        LEFT JOIN EVENT_NEST_SCHEMA.EVENTS AS T4 ON T4.AGGREGATE_ROOT_ID = T3.AGGREGATE_ROOT_ID;`;
+        LEFT JOIN EVENT_NEST.EVENTS AS T4 ON T4.AGGREGATE_ROOT_ID = T3.AGGREGATE_ROOT_ID;`;
     return this.eventSourcePgService.$queryRaw(query);
   }
 
@@ -53,18 +52,18 @@ export default abstract class RecoverService {
               AGGREGATE_ROOT_ID,
               T1.PAYLOAD
             FROM
-              EVENT_NEST_SCHEMA.SNAPSHOTS AS T1
+              EVENT_NEST.SNAPSHOTS AS T1
             WHERE
               T1.AGGREGATE_ROOT_VERSION = (
                 SELECT
                   MAX(T2.AGGREGATE_ROOT_VERSION)
                 FROM
-                  EVENT_NEST_SCHEMA.SNAPSHOTS AS T2
+                  EVENT_NEST.SNAPSHOTS AS T2
                 WHERE
                   T1.AGGREGATE_ROOT_ID = T2.AGGREGATE_ROOT_ID
               )
           ) AS T3
-        LEFT JOIN EVENT_NEST_SCHEMA.EVENTS AS T4 ON T4.AGGREGATE_ROOT_ID = T3.AGGREGATE_ROOT_ID
+        LEFT JOIN EVENT_NEST.EVENTS AS T4 ON T4.AGGREGATE_ROOT_ID = T3.AGGREGATE_ROOT_ID
         WHERE T4.AGGREGATE_ROOT_NAME = ${aggregateName}`;
     return this.eventSourcePgService.$queryRaw(query);
   }

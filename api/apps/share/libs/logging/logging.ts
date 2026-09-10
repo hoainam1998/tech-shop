@@ -17,6 +17,11 @@ const upperContextName = (context: string): string => {
   return context;
 };
 
+/**
+ * Logging base class.
+ * @abstract
+ * @class
+ */
 export default abstract class Logging {
   protected abstract readonly context: string;
   protected abstract readonly file: URL;

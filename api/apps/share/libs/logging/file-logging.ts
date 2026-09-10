@@ -2,6 +2,10 @@ import winston from 'winston';
 import Logging from './logging';
 import { recoverLog } from './winston';
 
+/**
+ * Log information to a file.
+ * @class
+ */
 export default class FileLogging extends Logging {
   private logger!: winston.Logger;
 

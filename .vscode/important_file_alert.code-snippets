@@ -1,0 +1,12 @@
+{
+	"Important file alert": {
+		"prefix": "important_file",
+		"body": [
+			"# Type \"important_file + Enter\"",
+			"# This is file for building.",
+			"# Please don't modify it.",
+			"$2",
+		],
+		"description": "Alert they are files so important. Please don't modify them."
+	}
+}

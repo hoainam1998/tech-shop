@@ -15,7 +15,7 @@ export const redisConfig = registerAs('redis', () => ({
 }));
 
 export const bullMq = registerAs('bullMq', () => ({
-  BULLMQ_SERVER_HOST: process.env.REDIS_SERVER_HOST,
+  BULLMQ_SERVER_HOST: process.env.BULLMQ_SERVER_HOST,
   BULLMQ_SERVER_PORT: process.env.BULLMQ_SERVER_PORT,
 }));
 
