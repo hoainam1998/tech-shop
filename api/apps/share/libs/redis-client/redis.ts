@@ -20,7 +20,7 @@ class RedisClient {
   constructor(config: ENVService) {
     this.redisClient = createClient({
       socket: {
-        host: process.env.NODE_ENV === 'docker' ? 'host.docker.internal' : config.Redis.REDIS_SERVER_HOST,
+        host: config.Redis.REDIS_SERVER_HOST,
         port: config.Redis.REDIS_SERVER_PORT,
       },
     });

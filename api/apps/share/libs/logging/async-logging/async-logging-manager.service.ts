@@ -1,12 +1,12 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma/event-source';
 import { EVENT_SOURCE_PG_CONNECTOR } from '@share/di-token';
-import AsyncLoggingService from './async-logging.service';
 import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
+import AsyncLoggingService from './async-logging.service';
 
 @Injectable()
 export default class AsyncLoggingManager implements OnModuleDestroy {
-  private readonly loggers: Map<string, AsyncLoggingService> = new Map();
+  private readonly _loggers: Map<string, AsyncLoggingService> = new Map();
 
   constructor(
     @Inject(EVENT_SOURCE_PG_CONNECTOR) private readonly eventSourceDatabase: PrismaClient,
@@ -19,16 +19,16 @@ export default class AsyncLoggingManager implements OnModuleDestroy {
    * @returns {AsyncLoggingService} - The parent logger.
    */
   getLogger(requestId: string): AsyncLoggingService {
-    if (this.loggers.has(requestId)) {
-      return this.loggers.get(requestId)!;
+    if (this._loggers.has(requestId)) {
+      return this._loggers.get(requestId)!;
     }
 
     const logger = new AsyncLoggingService(this.eventSourceDatabase, this.mailingService);
-    this.loggers.set(requestId, logger);
+    this._loggers.set(requestId, logger);
     return logger;
   }
 
   onModuleDestroy() {
-    this.loggers.clear();
+    this._loggers.clear();
   }
 }

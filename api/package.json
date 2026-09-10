@@ -8,6 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "db:deploy": "scripts/db-deploy.prisma.sh",
+    "db:create-user": "scripts/create-user.prisma.sh",
     "docker-dev": "docker compose --project-name redis run -d -p 6379:6379 -p 8001:8001 --name redis_c redis-stack",
     "docker-bullmq": "docker compose --project-name redis run -d -p 6381:6379 -p 8000:8001 --name redis_bullmq_c redis-stack",
     "start": "nest start",

@@ -14,7 +14,7 @@ import CategoryEventSourceService from './modules/category/category.service';
           connectionUri: envService.EventSource.EVENT_SOURCE_DATABASE_URL,
           eventsTableName: envService.EventSource.EVENTS_TABLE_NAME,
           schemaName: envService.EventSource.SCHEMA_NAME,
-          ensureTablesExist: true,
+          ensureTablesExist: false,
           snapshotTableName: envService.EventSource.SNAPSHOT_TABLE_NAME,
           snapshotStrategy: new ForCountSnapshotStrategy({ count: 1 }),
         };

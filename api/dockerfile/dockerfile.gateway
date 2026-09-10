@@ -1,0 +1,21 @@
+FROM node:24-alpine
+
+WORKDIR /api
+
+ENV NODE_ENV='docker'
+
+COPY ../../package.json ../../package-lock.json ./
+COPY ../../nest-cli.json ./
+COPY ../../tsconfig.json ./
+COPY ../../types.d.ts ./
+
+RUN npm install
+
+COPY ../../apps/api-gateway ./apps/api-gateway
+COPY ../../apps/share ./apps/share
+COPY ../assets ./assets
+COPY ../generated ./generated
+
+EXPOSE 5000
+
+CMD ["sh", "-c", "npm run start:dev api"]

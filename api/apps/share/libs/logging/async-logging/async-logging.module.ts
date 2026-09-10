@@ -1,8 +1,8 @@
 import { Module, Scope } from '@nestjs/common';
 import { eventSourcePgProvider } from '@share/providers';
+import MailingModule from '@share/libs/bullmq/queues/mailing/mailing.module';
 import AsyncLoggingService from './async-logging.service';
 import AsyncLoggingManager from './async-logging-manager.service';
-import MailingModule from '@share/libs/bullmq/queues/mailing/mailing.module';
 
 @Module({
   imports: [MailingModule],

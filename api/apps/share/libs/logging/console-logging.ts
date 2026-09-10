@@ -2,6 +2,10 @@ import winston from 'winston';
 import Logging from './logging';
 import { consoleLog } from './winston';
 
+/**
+ * Console log.
+ * @class
+ */
 export default class ConsoleLogging extends Logging {
   private logger!: winston.Logger;
 

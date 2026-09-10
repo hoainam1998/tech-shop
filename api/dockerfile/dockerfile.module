@@ -1,0 +1,19 @@
+FROM node:24-alpine
+
+WORKDIR /api
+
+ARG COMMAND
+ARG MODULE_NAME
+ENV EXECUTE_COMMAND=$COMMAND
+ENV NODE_ENV='docker'
+
+COPY ../../package.json ../../package-lock.json ./
+COPY ../../nest-cli.json ./
+COPY ../../tsconfig.json ./
+COPY ../../types.d.ts ./
+
+RUN npm install
+
+COPY ../../apps/modules/${MODULE_NAME} ./apps/modules/${MODULE_NAME}
+
+CMD ["sh", "-c", "${EXECUTE_COMMAND}"]

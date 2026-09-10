@@ -37,6 +37,10 @@ type MailConfig = {
   SYSTEM_ADMIN_EMAIL: string;
 };
 
+type ServiceHost = {
+  CATEGORY_MICROSERVICE_TCP_HOST: string;
+};
+
 @Injectable()
 export default class ENVService {
   constructor(private readonly configService: ConfigService) {}
@@ -49,8 +53,22 @@ export default class ENVService {
     return this.get<string>('LOCALHOST') || '';
   }
 
+  get DockerInternalHost() {
+    return 'host.docker.internal';
+  }
+
   get NodeENV() {
     return process.env.NODE_ENV;
+  }
+
+  get IsDockerBuild() {
+    return this.Localhost === 'docker';
+  }
+
+  get ServiceHost(): ServiceHost {
+    return {
+      CATEGORY_MICROSERVICE_TCP_HOST: this.IsDockerBuild ? this.DockerInternalHost : this.Localhost,
+    };
   }
 
   get Port(): PortEnvConfig {
@@ -76,16 +94,24 @@ export default class ENVService {
     };
   }
 
+  private get RedisServerHost() {
+    return this.get<string>('redis.REDIS_SERVER_HOST');
+  }
+
   get Redis(): RedisConfig {
     return {
-      REDIS_SERVER_HOST: this.get<string>('redis.REDIS_SERVER_HOST'),
+      REDIS_SERVER_HOST: this.IsDockerBuild ? this.DockerInternalHost : this.RedisServerHost,
       REDIS_SERVER_PORT: parseInt(this.get<string>('redis.REDIS_SERVER_PORT')),
     };
   }
 
+  private get BullMqServerHost() {
+    return this.get<string>('bullMq.BULLMQ_SERVER_HOST');
+  }
+
   get BullMqRedis(): BullMqConfig {
     return {
-      BULLMQ_SERVER_HOST: this.get<string>('bullMq.BULLMQ_SERVER_HOST'),
+      BULLMQ_SERVER_HOST: this.IsDockerBuild ? this.DockerInternalHost : this.BullMqServerHost,
       BULLMQ_SERVER_PORT: parseInt(this.get<string>('bullMq.BULLMQ_SERVER_PORT')),
     };
   }
