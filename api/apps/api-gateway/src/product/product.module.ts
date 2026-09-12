@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ClientProvider, ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
+import TenantNameService from '@share/helpers/tenant-name.service';
 import ProductService from './product.service';
 import ProductController from './product.controller';
-import { PRODUCT_SERVICE } from '@share/di-token';
-import TenantNameService from '../../../share/helpers/tenant-name.service';
 
 @Module({
   imports: [

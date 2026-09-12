@@ -1,9 +1,14 @@
 x-database-env: &database-env
-  DATABASE_URL: postgresql://postgres:root@db:5432/tech-shop?schema=public
-  DATABASE_URL_REPLICA_ADMIN: postgresql://tech_shop_admin:root@db:5432/tech-shop?schema=admin
-  DATABASE_URL_REPLICA_CUSTOMER: postgresql://tech_shop_customer:root@db:5432/tech-shop?schema=customer
-  DATABASE_URL_REPLICA_EMPLOYEE: postgresql://tech_shop_employee:root@db:5432/tech-shop?schema=employee
-  EVENT_SOURCE_DATABASE_URL: postgresql://postgres:root@db:5432/event-source?schema=event_nest
+  DATABASE_URL: postgresql://postgres:${USER}@db:5432/tech-shop?schema=public
+  DATABASE_URL_REPLICA_ADMIN: postgresql://tech_shop_admin:${USER}@db:5432/tech-shop?schema=admin
+  DATABASE_URL_REPLICA_CUSTOMER: postgresql://tech_shop_customer:${USER}@db:5432/tech-shop?schema=customer
+  DATABASE_URL_REPLICA_EMPLOYEE: postgresql://tech_shop_employee:${USER}@db:5432/tech-shop?schema=employee
+  EVENT_SOURCE_DATABASE_URL: postgresql://postgres:${USER}@db:5432/event-source?schema=${SCHEMA_NAME}
+
+x-service-healthcheck: &service-healthcheck
+  test: ["CMD", "curl", "-f", "http://${LOCALHOST}:${API_PORT}/healthy"]
+  timeout: 5s
+  retries: 5
 
 x-base-microservice: &base-microservice
   environment:
@@ -71,6 +76,8 @@ services:
         COMMAND: npm run db:deploy
     container_name: prisma-tech-shop
     tty: true
+    env_file:
+      - .env
     environment:
       <<: *database-env
     ports:
@@ -108,6 +115,8 @@ services:
     container_name: api_c
     ports:
       - ${API_PORT}:${API_PORT}
+    depends_on:
+      - category
 
 volumes:
   pgdata:
