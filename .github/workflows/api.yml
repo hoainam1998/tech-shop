@@ -1,0 +1,84 @@
+name: Tech Shop Api CI/CD
+
+on:
+  pull_request:
+    branches:
+      - master
+      - fs-*
+      - be-*
+  push:
+    branches:
+      - master
+      - fs-*
+      - be-*
+
+env:
+# Service port
+  API_PORT: ${{ secrets.API_PORT }}
+  USER_MICROSERVICE_TCP_PORT: ${{ secrets.USER_MICROSERVICE_TCP_PORT }}
+  CATEGORY_MICROSERVICE_TCP_PORT: ${{ secrets.CATEGORY_MICROSERVICE_TCP_PORT }}
+  PRODUCT_MICROSERVICE_TCP_PORT: ${{ secrets.PRODUCT_MICROSERVICE_TCP_PORT }}
+
+# Socket config
+  SOCKET_MICROSERVICE_TCP_PORT: ${{ secrets.SOCKET_MICROSERVICE_TCP_PORT }}
+  SOCKET_PORT: ${{ secrets.SOCKET_PORT }}
+  SOCKET_PING_INTERVAL: ${{ secrets.SOCKET_PING_INTERVAL }}
+  SOCKET_PING_TIMEOUT: ${{ secrets.SOCKET_PING_TIMEOUT }}
+
+  # localhost
+  LOCALHOST: ${{ secrets.LOCALHOST }}
+
+  # Redis config
+  REDIS_SERVER_HOST: ${{ secrets.LOCALHOST }}
+  REDIS_SERVER_PORT: ${{ secrets.REDIS_SERVER_PORT }}
+  BULLMQ_SERVER_HOST: ${{ secrets.REDIS_SERVER_HOST }}
+  BULLMQ_SERVER_PORT: ${{ secrets.REDIS_SERVER_PORT }}
+
+  # Email config
+  SMPT_HOST: ${{ secrets.SMPT_HOST }}
+  SMPT_PORT:  ${{ secrets.SMPT_PORT }}
+  SMPT_MAIL: ${{ secrets.SMPT_MAIL }}
+  SMPT_APP_PASS: ${{ secrets.SMPT_APP_PASS }}
+  EMAIL_TEMPLATES: ${{ secrets.EMAIL_TEMPLATES }}
+  SYSTEM_ADMIN_EMAIL: ${{ secrets.SYSTEM_ADMIN_EMAIL }}
+
+  # Event source options.
+  AGGREGATES_TABLE_NAME: ${{ secrets.AGGREGATES_TABLE_NAME }}
+  SCHEMA_NAME: ${{ secrets.SCHEMA_NAME }}
+  EVENTS_TABLE_NAME: ${{ secrets.EVENTS_TABLE_NAME }}
+  SNAPSHOT_TABLE_NAME: ${{ secrets.SNAPSHOT_TABLE_NAME }}
+
+  # Database
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  EVENT_SOURCE_DATABASE_URL: ${{ secrets.EVENT_SOURCE_DATABASE_URL }}
+
+jobs:
+  build-and-test:
+    # if: contains(github.event.pull_request.labels.*.name, 'back-end')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache-dependency-path: api/package.json
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci --omit=optional
+
+      - name: Generate Prisma Client
+        run: bash ./scripts/db-generate.prisma.sh
+
+      - name: Linting
+        run: npm run lint -- --quiet
+
+      - name: Build Application
+        run: npm run build

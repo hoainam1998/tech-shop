@@ -1,8 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
-import { getProductPattern } from '@share/patterns';
-import { PRODUCT_SERVICE } from '@share/di-token';
+import { Injectable } from '@nestjs/common';
 import { IService } from '@share/interfaces';
 import { HandleMicroserviceRequestData } from '@share/decorators';
 import TenantNameService from '@share/helpers/tenant-name.service';
@@ -15,7 +11,7 @@ export default class ProductService implements IService {
   ) {}
 
   @HandleMicroserviceRequestData
-  getProducts(requestBody?: unknown): void {
+  getProducts(): void {
     // throw new Error('fff');
     // this.logger.error('message exception', new BadRequestException('fff'), 'fff');
     // this.logger.error('Failed to fetch users', { error: 'custom error' });

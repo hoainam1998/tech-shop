@@ -5,12 +5,14 @@ import ShareModule from '@share/share.module';
 import { TenantMiddleware, XssMiddleware } from '@share/middlewares';
 import ProductModule from './product/product.module';
 import CategoryModule from './category/category.module';
+import HealthyModule from './healthy/healthy.module';
 
 @Module({
   imports: [
     ShareModule,
     ProductModule,
     CategoryModule,
+    HealthyModule,
     ServeStaticModule.forRoot({
       rootPath: pathJoin('assets'),
       serveRoot: '/static',

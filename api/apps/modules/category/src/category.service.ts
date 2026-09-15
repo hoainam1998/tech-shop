@@ -31,7 +31,7 @@ export default class CategoryService extends Service {
   }
 
   @HandlePrismaError()
-  async createCategory(category: category): Promise<Partial<category>> {
+  createCategory(category: category): Promise<Partial<category>> {
     return this.prismaClient
       .$primary()
       .category.create({
@@ -64,7 +64,7 @@ export default class CategoryService extends Service {
   }
 
   async updateCategory(id: string): Promise<category> {
-    return this.prismaClient.$primary().category.update({
+    return await this.prismaClient.$primary().category.update({
       data: {
         name: 'category updated',
         icon: 'icon updated',
