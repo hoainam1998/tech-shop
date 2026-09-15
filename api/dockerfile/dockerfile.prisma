@@ -2,9 +2,6 @@ FROM node:24-alpine
 
 WORKDIR /api
 
-ARG COMMAND
-ENV EXECUTE_COMMAND=$COMMAND
-
 COPY ../../package.json ../../package-lock.json ./
 
 RUN npm ci
@@ -14,4 +11,4 @@ COPY ../../prisma-config ./prisma-config
 COPY ../../init-scripts ./init-scripts
 COPY ../../scripts ./scripts
 
-CMD ["sh", "-c", "${EXECUTE_COMMAND} && npm run db:create-user"]
+CMD ["sh", "-c", "npm run db:deploy && npm run db:create-user"]

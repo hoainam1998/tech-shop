@@ -5,7 +5,9 @@ export default function (target: any, propertyKey: string, descriptor: PropertyD
   descriptor.value = function (...args: any[]) {
     const data = args[0];
     const request = {
-      header: (this as IService).tenantService.TenantName,
+      header: {
+        tenant: (this as IService).alsService.Tenant,
+      },
     };
 
     if (data) {
@@ -15,5 +17,6 @@ export default function (target: any, propertyKey: string, descriptor: PropertyD
     args[0] = request;
     return originMethod.apply(this, args);
   };
+
   return descriptor;
 }

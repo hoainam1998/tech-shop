@@ -1,4 +1,4 @@
-name: Tech Shop Api CI/CD
+name: Tech Shop Api CI/CD Build
 
 on:
   pull_request:
@@ -12,58 +12,20 @@ on:
       - fs-*
       - be-*
 
-env:
-# Service port
-  API_PORT: ${{ secrets.API_PORT }}
-  USER_MICROSERVICE_TCP_PORT: ${{ secrets.USER_MICROSERVICE_TCP_PORT }}
-  CATEGORY_MICROSERVICE_TCP_PORT: ${{ secrets.CATEGORY_MICROSERVICE_TCP_PORT }}
-  PRODUCT_MICROSERVICE_TCP_PORT: ${{ secrets.PRODUCT_MICROSERVICE_TCP_PORT }}
-
-# Socket config
-  SOCKET_MICROSERVICE_TCP_PORT: ${{ secrets.SOCKET_MICROSERVICE_TCP_PORT }}
-  SOCKET_PORT: ${{ secrets.SOCKET_PORT }}
-  SOCKET_PING_INTERVAL: ${{ secrets.SOCKET_PING_INTERVAL }}
-  SOCKET_PING_TIMEOUT: ${{ secrets.SOCKET_PING_TIMEOUT }}
-
-  # localhost
-  LOCALHOST: ${{ secrets.LOCALHOST }}
-
-  # Redis config
-  REDIS_SERVER_HOST: ${{ secrets.LOCALHOST }}
-  REDIS_SERVER_PORT: ${{ secrets.REDIS_SERVER_PORT }}
-  BULLMQ_SERVER_HOST: ${{ secrets.REDIS_SERVER_HOST }}
-  BULLMQ_SERVER_PORT: ${{ secrets.REDIS_SERVER_PORT }}
-
-  # Email config
-  SMPT_HOST: ${{ secrets.SMPT_HOST }}
-  SMPT_PORT:  ${{ secrets.SMPT_PORT }}
-  SMPT_MAIL: ${{ secrets.SMPT_MAIL }}
-  SMPT_APP_PASS: ${{ secrets.SMPT_APP_PASS }}
-  EMAIL_TEMPLATES: ${{ secrets.EMAIL_TEMPLATES }}
-  SYSTEM_ADMIN_EMAIL: ${{ secrets.SYSTEM_ADMIN_EMAIL }}
-
-  # Event source options.
-  AGGREGATES_TABLE_NAME: ${{ secrets.AGGREGATES_TABLE_NAME }}
-  SCHEMA_NAME: ${{ secrets.SCHEMA_NAME }}
-  EVENTS_TABLE_NAME: ${{ secrets.EVENTS_TABLE_NAME }}
-  SNAPSHOT_TABLE_NAME: ${{ secrets.SNAPSHOT_TABLE_NAME }}
-
-  # Database
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  EVENT_SOURCE_DATABASE_URL: ${{ secrets.EVENT_SOURCE_DATABASE_URL }}
-
 jobs:
-  build-and-test:
-    # if: contains(github.event.pull_request.labels.*.name, 'back-end')
+  docker-run:
+    name: Docker build.
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./api
 
     steps:
+      # Step 1: Clone source to runner.
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Step 2: Install nodejs.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -71,14 +33,59 @@ jobs:
           cache-dependency-path: api/package.json
           cache: 'npm'
 
+      # Step 3: Create .env file.
+      - name: Create .env file
+        run: |
+          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
+          echo "USER_MICROSERVICE_TCP_PORT=${{ secrets.USER_MICROSERVICE_TCP_PORT }}" >> .env
+          echo "CATEGORY_MICROSERVICE_TCP_PORT=${{ secrets.CATEGORY_MICROSERVICE_TCP_PORT }}" >> .env
+          echo "PRODUCT_MICROSERVICE_TCP_PORT=${{ secrets.PRODUCT_MICROSERVICE_TCP_PORT }}" >> .env
+          echo "REDIS_SERVER_HOST=${{ secrets.REDIS_SERVER_HOST }}" >> .env
+          echo "REDIS_SERVER_PORT=${{ secrets.REDIS_SERVER_PORT }}" >> .env
+          echo "BULLMQ_SERVER_HOST=${{ secrets.BULLMQ_SERVER_HOST }}" >> .env
+          echo "BULLMQ_SERVER_PORT=${{ secrets.BULLMQ_SERVER_PORT }}" >> .env
+          echo "SMPT_HOST=${{ secrets.SMPT_HOST }}" >> .env
+          echo "SMPT_PORT=${{ secrets.SMPT_PORT }}" >> .env
+          echo "SMPT_MAIL=${{ secrets.SMPT_MAIL }}" >> .env
+          echo "SMPT_APP_PASS=${{ secrets.SMPT_APP_PASS }}" >> .env
+          echo "EMAIL_TEMPLATES=${{ secrets.EMAIL_TEMPLATES }}" >> .env
+          echo "SYSTEM_ADMIN_EMAIL=${{ secrets.SYSTEM_ADMIN_EMAIL }}" >> .env
+          echo "AGGREGATES_TABLE_NAME=${{ secrets.AGGREGATES_TABLE_NAME }}" >> .env
+          echo "SCHEMA_NAME=${{ secrets.SCHEMA_NAME }}" >> .env
+          echo "EVENTS_TABLE_NAME=${{ secrets.EVENTS_TABLE_NAME }}" >> .env
+          echo "SNAPSHOT_TABLE_NAME=${{ secrets.SNAPSHOT_TABLE_NAME }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "EVENT_SOURCE_DATABASE_URL=${{ secrets.EVENT_SOURCE_DATABASE_URL }}" >> .env
+
+      # Step 4: Install dependencies ignoring optionalDependencies.
       - name: Install Dependencies
         run: npm ci --omit=optional
 
+      # Step 5: Prisma generate.
       - name: Generate Prisma Client
         run: bash ./scripts/db-generate.prisma.sh
 
+      # Step 6: ESLint test.
       - name: Linting
         run: npm run lint -- --quiet
 
+      # Step 7: Build.
       - name: Build Application
+        if: github.base_ref != 'master' && github.event_name == 'push'
         run: npm run build
+
+      # Step 8: Build Docker Image.
+      - name: Start Docker containerizing
+        if: github.base_ref == 'master' && github.event_name == 'pull_request'
+        run: docker compose up -d --build
+
+      # Step 9: Verify Endpoint Response.
+      - name: Verify Application Health
+        if: github.base_ref == 'master' && github.event_name == 'pull_request'
+        run: |
+          curl --head --fail --retry 30 --retry-all-errors --retry-delay 2 http://localhost:5000/healthy/ || exit 1
+
+      # Step 10: Release containerization, delete volumes.
+      - name: Tear Down Docker Services
+        if: always() && github.base_ref == 'master' && github.event_name == 'pull_request'
+        run: docker compose down -v

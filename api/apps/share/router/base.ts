@@ -53,25 +53,56 @@ export class Route {
  */
 export default class Router {
   private _baseUrl: string = '';
+  private static readonly _routes = new Map<string, unknown>();
 
   /**
    *
    * @param {string} baseUrl - The base url.
    */
   constructor(baseUrl: string) {
-    this.BaseUrl = baseUrl;
-  }
-
-  protected set BaseUrl(url) {
-    if (/^\w+$/m.test(url)) {
-      this._baseUrl = url;
-    } else {
-      throw new Error('eee');
+    if (!Router._routes.has(baseUrl)) {
+      this.BaseUrl = baseUrl;
     }
   }
 
+  /**
+   * Return baseUrl.
+   */
+  protected set BaseUrl(url) {
+    if (/^\w+$/m.test(url)) {
+      this._baseUrl = url;
+      Router._routes.set(this._baseUrl, this);
+    } else {
+      throw new Error('Base url is invalid!');
+    }
+  }
+
+  /**
+   * Get base url.
+   */
   get BaseUrl() {
     return this._baseUrl;
+  }
+
+  /**
+   * Get wildcard.
+   */
+  get WildCard() {
+    return `${this.BaseUrl}/{*splat}`;
+  }
+
+  /**
+   * Get router instance stored or create one if it not exist.
+   * @param {string} baseUrl - The base url string.
+   * @returns {Router} The router instance.
+   */
+  static getInstance<T extends Router>(baseUrl: string): T {
+    if (this._routes.has(baseUrl)) {
+      return this._routes.get(baseUrl)! as T;
+    }
+    const router = new this(baseUrl) as T;
+    this._routes.set(baseUrl, router);
+    return router;
   }
 
   /**

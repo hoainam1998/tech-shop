@@ -1,6 +1,5 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { LogType } from 'generated/prisma/event-source';
 import { QUEUE_NAME } from '@share/enums';
 import { LoggingJobData } from '@share/interfaces';
 import AsyncLoggingService from '@share/libs/logging/async-logging/async-logging.service';
@@ -20,27 +19,8 @@ export default class LoggingConsumer extends WorkerHost {
     super();
   }
 
-  create(id: string, context: string, file: URL): void {
-    this.asyncLogging.create(id, context, file);
-  }
-
   process(job: Job<LoggingJobData>): any {
-    const asyncLog = this.asyncLogging.getLogger(job.data.id!);
-    if (asyncLog) {
-      switch (job.data.type) {
-        case LogType.INFO:
-          asyncLog?.log(job.data.message, job.data.func, job.data.payload);
-          break;
-        case LogType.ERROR:
-          asyncLog?.error(job.data.message, job.data.func, job.data.payload);
-          break;
-        case LogType.WARN:
-          asyncLog?.warn(job.data.message, job.data.func, job.data.payload);
-          break;
-        default:
-          break;
-      }
-    }
+    this.asyncLogging.write(job.data);
     return {};
   }
 }

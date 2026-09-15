@@ -6,6 +6,8 @@ export default Object.freeze({
     MODULE_DISCONNECT: 'The module require is disconnect!',
     COMMON_ERROR: 'Something have broken. Please try again!',
     THROTTLER_ERROR: 'Too many requests in a second!',
+    MISS_TENANT: 'Tenant-Id header is missing!',
+    INVALID_TENANT: 'Tenant-Id is invalid!',
   },
   DATABASE: {
     DATABASE_DISCONNECT: 'Database was disconnect. Please try again!',

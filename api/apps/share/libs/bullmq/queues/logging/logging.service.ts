@@ -1,24 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Job, Queue } from 'bullmq';
-import { randomUUID } from 'crypto';
 import { QUEUE_NAME, JOB_NAME } from '@share/enums';
 import { LoggingPayloadType, AsyncLoggingJobData } from '@share/interfaces';
 import { LogType } from 'generated/prisma/event-source';
-import LoggingConsumer from './logging.consumer';
 
 @Injectable()
 export default class LoggingService {
-  private _id: string;
-  constructor(
-    @InjectQueue(QUEUE_NAME.LOGGING) private readonly queue: Queue,
-    private readonly loggingConsumer: LoggingConsumer,
-  ) {
-    this._id = randomUUID();
-  }
+  private _context!: string;
+  private _file!: URL;
+
+  constructor(@InjectQueue(QUEUE_NAME.LOGGING) private readonly queue: Queue) {}
 
   create(context: string, file: URL): void {
-    this.loggingConsumer.create(this._id, context, file);
+    this._context = context;
+    this._file = file;
   }
 
   /**
@@ -38,7 +34,10 @@ export default class LoggingService {
 
   private addJob(jobData: AsyncLoggingJobData): Promise<Job<any, any>> {
     const payload = this.convertJobPayload(jobData.payload);
-    return this.queue.add(JOB_NAME.LOGGING, Object.assign(jobData, { payload, id: this._id }));
+    return this.queue.add(
+      JOB_NAME.LOGGING,
+      Object.assign(jobData, { payload, context: this._context, file: this._file }),
+    );
   }
 
   async log(jobData: AsyncLoggingJobData): Promise<void> {

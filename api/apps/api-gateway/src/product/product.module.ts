@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import TenantNameService from '@share/helpers/tenant-name.service';
 import ProductService from './product.service';
 import ProductController from './product.controller';
 
@@ -21,7 +20,7 @@ import ProductController from './product.controller';
     //   },
     // ]),
   ],
-  providers: [ProductService, TenantNameService],
+  providers: [ProductService],
   controllers: [ProductController],
 })
 export default class ProductModule {}

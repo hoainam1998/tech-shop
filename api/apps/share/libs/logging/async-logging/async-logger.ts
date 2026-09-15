@@ -23,7 +23,7 @@ export default class AsyncLogging extends Logging {
    * @param {MailingService} mailingService - The bullmq mailing service.
    * @param {string} context - The message context.
    * @param {URL} file - A current file path.
-   * @param {Record<string, any>} - The user requested.
+   * @param {Record<string, any>} userRequested - The user requested.
    */
   constructor(
     private readonly db: PrismaClient,

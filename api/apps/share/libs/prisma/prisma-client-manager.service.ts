@@ -8,6 +8,11 @@ export default class PrismaClientManager implements OnModuleDestroy {
   private readonly clients: Map<string, PrismaClient | ReturnType<PrismaClient['$extends']>> = new Map();
   constructor(private readonly tenantConfigService: TenantConfigService) {}
 
+  /**
+   * Get PrismaClient.
+   * @param {TENANT_NAME} tenantSchema - The tenant name.
+   * @returns The PrismaClient.
+   */
   getClient(tenantSchema: TENANT_NAME): PrismaClient | ReturnType<PrismaClient['$extends']> {
     if (this.clients.has(tenantSchema)) {
       return this.clients.get(tenantSchema)!;
