@@ -81,6 +81,7 @@ jobs:
 
       # Step 9: Verify Endpoint Response.
       - name: Verify Application Health
+        if: github.base_ref == 'master' && github.event_name == 'pull_request'
         run: |
           curl --head --fail --retry 30 --retry-all-errors --retry-delay 2 http://localhost:5000/healthy/ || exit 1
 
