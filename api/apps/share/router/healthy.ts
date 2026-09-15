@@ -1,9 +1,5 @@
 import BaseRouter from './base';
 
-class HealthyRouter extends BaseRouter {
-  constructor() {
-    super('healthy');
-  }
-}
+class HealthyRouter extends BaseRouter {}
 
-export default new HealthyRouter();
+export default HealthyRouter.getInstance<HealthyRouter>('healthy');

@@ -1,15 +1,13 @@
-import { OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from 'generated/prisma/event-source';
+import { PrismaClient, LogType } from 'generated/prisma/event-source';
 import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
+import { LoggingJobData } from '@share/interfaces';
 import AsyncLogger from './async-logger';
 
 /**
  * Logging helper class.
  * @class
  */
-export default class AsyncLoggingService implements OnModuleDestroy {
-  private readonly _loggers: Map<string, AsyncLogger> = new Map();
-
+export default class AsyncLoggingService {
   /**
    * Logging system message.
    * @param {PrismaClient} eventSourceDatabase - The database instance.
@@ -22,23 +20,32 @@ export default class AsyncLoggingService implements OnModuleDestroy {
 
   /**
    * Create an async logger (child logger).
-   * @param {string} id - The logger id.
    * @param {string} context - The logging context.
    * @param {URL} file - The current file.
    * @returns {AsyncLogger} The async logger.
    */
-  create(id: string, context: string, file: URL): void {
-    if (!this._loggers.has(id)) {
-      const logger = new AsyncLogger(this.eventSourceDatabase, this.mailingService, context, file, {});
-      this._loggers.set(id, logger);
+  create(context: string, file: URL): AsyncLogger | undefined {
+    return new AsyncLogger(this.eventSourceDatabase, this.mailingService, context, file, {});
+  }
+
+  /**
+   * Write log to database.
+   * @param {LoggingJobData} job - A job data.
+   */
+  write(job: LoggingJobData): void {
+    const logger = this.create(job.context!, job.file!);
+    switch (job.type) {
+      case LogType.INFO:
+        logger?.log(job.message, job.func, job.payload);
+        break;
+      case LogType.ERROR:
+        logger?.error(job.message, job.func, job.payload);
+        break;
+      case LogType.WARN:
+        logger?.warn(job.message, job.func, job.payload);
+        break;
+      default:
+        break;
     }
-  }
-
-  getLogger(id: string): AsyncLogger | undefined {
-    return this._loggers.get(id);
-  }
-
-  onModuleDestroy() {
-    this._loggers.clear();
   }
 }

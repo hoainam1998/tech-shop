@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma/tech-shop';
 import { Prisma, LogType, log } from 'generated/prisma/event-source';
-import TenantNameService from '@share/helpers/tenant-name.service';
-import { EVENT_NAME } from './enums';
+import { EVENT_NAME, TENANT_NAME } from './enums';
+import AlsService from './libs/als/als.service';
 
 export type EventPatternType = { cmd: string };
 
@@ -17,7 +17,7 @@ export type MicroserviceHeaderType = {
 
 export interface IService {
   readonly [key: string]: any;
-  readonly tenantService: TenantNameService;
+  readonly alsService: AlsService;
 }
 
 export type MessageResponseType = {
@@ -55,11 +55,12 @@ export type EventSourceJobData = {
 export type LoggingPayloadType = Record<string, number | string>;
 
 export type LoggingJobData = {
-  id?: string;
   message: string;
   func: string;
   type?: LogType;
   payload: LoggingPayloadType;
+  file?: URL;
+  context?: string;
 };
 
 export type AsyncLoggingJobData = Omit<LoggingJobData, 'payload'> & {
@@ -68,3 +69,7 @@ export type AsyncLoggingJobData = Omit<LoggingJobData, 'payload'> & {
 
 export type MailingJobData = Pick<Prisma.logCreateInput, 'type' | 'payload' | 'func' | 'message'> &
   Pick<log, 'user_requested' | 'context' | 'file' | 'at'>;
+
+export type AsyncLocalStore = {
+  tenantSchema: TENANT_NAME;
+};

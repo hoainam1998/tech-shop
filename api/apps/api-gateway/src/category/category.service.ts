@@ -5,13 +5,13 @@ import { category } from 'generated/prisma/tech-shop';
 import { CATEGORY_SERVICE } from '@share/di-token';
 import { createCategoryPattern, getAllCategoriesPattern } from '@share/patterns';
 import { HandleMicroserviceRequestData } from '@share/decorators';
-import TenantNameService from '@share/helpers/tenant-name.service';
+import AlsService from '@share/libs/als/als.service';
 
 @Injectable()
 export default class CategoryService {
   constructor(
     @Inject(CATEGORY_SERVICE) private readonly categoryService: ClientProxy,
-    readonly tenantService: TenantNameService,
+    readonly alsService: AlsService,
   ) {}
 
   @HandleMicroserviceRequestData

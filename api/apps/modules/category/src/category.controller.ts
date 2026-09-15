@@ -3,7 +3,6 @@ import { MessagePattern } from '@nestjs/microservices';
 import type { category, Prisma } from 'generated/prisma/tech-shop';
 import { createCategoryPattern, getAllCategoriesPattern } from '@share/patterns';
 import { DecodeMicroserviceRequestData, HandleServiceError } from '@share/decorators';
-import type { MicroserviceHeaderType } from '@share/interfaces';
 import Service from '@share/helpers/service';
 import { ENTITY_SERVICE_NAME } from '@share/enums';
 import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
@@ -28,14 +27,14 @@ export default class CategoryController extends Service {
   @MessagePattern(createCategoryPattern)
   @DecodeMicroserviceRequestData
   @HandleServiceError
-  createCategory(header: MicroserviceHeaderType, data: category): Promise<Partial<category>> {
+  createCategory(data: category): Promise<Partial<category>> {
     return this.categoryService.createCategory(data);
   }
 
   @MessagePattern(getAllCategoriesPattern)
   @DecodeMicroserviceRequestData
   @HandleServiceError
-  getAllCategories(header: MicroserviceHeaderType, data: Prisma.categorySelect): Promise<Partial<category>[]> {
+  getAllCategories(data: Prisma.categorySelect): Promise<Partial<category>[]> {
     return this.categoryService.getAllCategories(data);
   }
 }

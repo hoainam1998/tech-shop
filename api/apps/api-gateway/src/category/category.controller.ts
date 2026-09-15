@@ -52,10 +52,4 @@ export default class CategoryController {
     void this.loggingService.log({ message: 'msg', func: this.test.name, payload: {} });
     return 'ok';
   }
-
-  @HttpCode(HttpStatus.OK)
-  @Get('healthy-check')
-  healthyCheck() {
-    return this.healthyCheck.name;
-  }
 }

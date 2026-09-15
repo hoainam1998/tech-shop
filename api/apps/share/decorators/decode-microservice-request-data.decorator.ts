@@ -4,7 +4,7 @@ export default function (target: any, propertyKey: string, descriptor: PropertyD
     const originData = args[0];
     const data = originData.data;
     const header = originData.header;
-    args = [header, data];
+    args = [data, header];
     return originMethod.apply(this, args);
   };
   return descriptor;

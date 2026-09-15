@@ -62,7 +62,7 @@ export default class ENVService {
   }
 
   get IsDockerBuild() {
-    return this.Localhost === 'docker';
+    return this.NodeENV === 'docker';
   }
 
   get ServiceHost(): ServiceHost {

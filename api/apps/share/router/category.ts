@@ -1,10 +1,6 @@
 import BaseRouter from './base';
 
 class CategoryRouter extends BaseRouter {
-  constructor() {
-    super('category');
-  }
-
   /**
    * /category/create
    */
@@ -20,4 +16,4 @@ class CategoryRouter extends BaseRouter {
   }
 }
 
-export default new CategoryRouter();
+export default CategoryRouter.getInstance<CategoryRouter>('category');

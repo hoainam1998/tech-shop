@@ -11,8 +11,8 @@
     "db:deploy": "scripts/db-deploy.prisma.sh",
     "db:generate": "scripts/db-generate.prisma.sh",
     "db:create-user": "scripts/create-user.prisma.sh",
-    "docker-dev": "docker compose --project-name redis run -d -p 6379:6379 -p 8001:8001 --name redis_c redis-stack",
-    "docker-bullmq": "docker compose --project-name redis run -d -p 6381:6379 -p 8000:8001 --name redis_bullmq_c redis-stack",
+    "docker-dev": "docker compose --project-name redis run -d -p 6379:6379 -p 8001:8001 --name redis_storage_c redis-storage",
+    "docker-bullmq": "docker compose --project-name redis run -d -p 6381:6379 -p 8000:8001 --name redis_bullmq_c redis-bullmq",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -109,6 +109,10 @@
     ]
   },
   "allowScripts": {
-    "prisma@7.9.0": true
+    "@parcel/watcher@2.6.0": true,
+    "@prisma/engines@7.10.0": true,
+    "msgpackr-extract@3.0.4": true,
+    "prisma@7.10.0": true,
+    "unrs-resolver@1.12.2": true
   }
 }

@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ClientProvider, ClientsModule, Transport } from '@nestjs/microservices';
-import CategoryService from './category.service';
-import CategoryController from './category.controller';
 import { CATEGORY_SERVICE } from '@share/di-token';
 import ENVService from '@share/environment-config/env-config.service';
-import TenantNameService from '@share/helpers/tenant-name.service';
 import MailModule from '@share/libs/mailer/mailer.module';
+import CategoryService from './category.service';
+import CategoryController from './category.controller';
 
 @Module({
   imports: [
@@ -26,7 +25,7 @@ import MailModule from '@share/libs/mailer/mailer.module';
     ]),
     MailModule,
   ],
-  providers: [CategoryService, TenantNameService],
+  providers: [CategoryService],
   controllers: [CategoryController],
 })
 export default class CategoryModule {}
