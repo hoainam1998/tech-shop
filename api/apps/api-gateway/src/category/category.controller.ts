@@ -9,6 +9,9 @@ import { createMessage } from '@share/utils';
 import messages from '@share/constants/messages';
 import { MessageResponseType } from '@share/interfaces';
 import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
+import IdempotencyInterceptor from '@share/interceptors/idempotency.interceptor';
+import { IdempotencyTTL } from '@share/decorators/idempotency';
+import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
 import CategoryService from './category.service';
 
 // Type "current_file + Enter"
@@ -17,6 +20,7 @@ import CategoryService from './category.service';
 // Using __filename only reference file complied!
 const currentFilePath = import.meta.url as URL;
 
+@UseInterceptors(IdempotencyInterceptor)
 @Controller(CategoryRouter.BaseUrl)
 export default class CategoryController {
   constructor(
@@ -47,9 +51,9 @@ export default class CategoryController {
     return this.categoryService.getAllCategories(instanceToPlain(select));
   }
 
+  @IdempotencyTTL(IDEMPOTENCY_OPTION_NAME.SHORT)
   @Get('test')
   test() {
-    void this.loggingService.log({ message: 'msg', func: this.test.name, payload: {} });
     return 'ok';
   }
 }

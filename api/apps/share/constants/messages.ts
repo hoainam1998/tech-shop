@@ -8,6 +8,9 @@ export default Object.freeze({
     THROTTLER_ERROR: 'Too many requests in a second!',
     MISS_TENANT: 'Tenant-Id header is missing!',
     INVALID_TENANT: 'Tenant-Id is invalid!',
+    REQUEST_HANDLING: 'Your request are handling!',
+    MISS_IDEMPOTENCY_KEY: "Header 'x-idempotency-key' is required for this request.",
+    INVALID_IDEMPOTENCY_KEY: "Header 'x-idempotency-key' must be a UUID.",
   },
   DATABASE: {
     DATABASE_DISCONNECT: 'Database was disconnect. Please try again!',

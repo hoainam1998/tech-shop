@@ -2,9 +2,11 @@ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { pathJoin } from '@share/utils';
 import ShareModule from '@share/share.module';
-import { TenantMiddleware, XssMiddleware } from '@share/middlewares';
+import { TenantMiddleware, XssMiddleware, IdempotencyMiddleware } from '@share/middlewares';
 import HealthyRouter from '@share/router/healthy';
 import StaticRouter from '@share/router/static';
+import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
+import IdempotencyRegisterModule from '@share/libs/idempotency/idempotency.module';
 import ProductModule from './product/product.module';
 import CategoryModule from './category/category.module';
 import HealthyModule from './healthy/healthy.module';
@@ -19,12 +21,22 @@ import HealthyModule from './healthy/healthy.module';
       rootPath: pathJoin('assets'),
       serveRoot: StaticRouter.BaseUrl,
     }),
+    IdempotencyRegisterModule.forRoot([
+      {
+        name: IDEMPOTENCY_OPTION_NAME.MEDIUM,
+        ttl: 50,
+      },
+      {
+        name: IDEMPOTENCY_OPTION_NAME.SHORT,
+        ttl: 20,
+      },
+    ]),
   ],
 })
 export default class ApiGatewayModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(TenantMiddleware, XssMiddleware)
+      .apply(TenantMiddleware, IdempotencyMiddleware, XssMiddleware)
       .exclude(StaticRouter.WildCard, HealthyRouter.WildCard)
       .forRoutes('*');
   }
