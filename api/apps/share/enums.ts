@@ -42,3 +42,13 @@ export enum EVENT_NAME {
 export enum AGGREGATE_NAME {
   CATEGORY = 'category',
 }
+
+export enum REQUEST_HANDLING_STATUS {
+  IN_PROGRESS = 'in_progress',
+  DONE = 'done',
+}
+
+export enum IDEMPOTENCY_OPTION_NAME {
+  MEDIUM = 'medium',
+  SHORT = 'short',
+}

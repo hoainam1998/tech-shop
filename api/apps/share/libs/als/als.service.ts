@@ -13,13 +13,28 @@ export default class AlsService {
    * @param {NextFunction} next - An express next function.
    */
   run(store: AsyncLocalStore, next: NextFunction): void {
-    this.als.run(store, () => next());
+    const oldStore = this.Store;
+    this.als.run(Object.assign(oldStore || {}, store), () => next());
+  }
+
+  /**
+   * Return entire store data.
+   */
+  get Store() {
+    return this.als.getStore();
   }
 
   /**
    * Return tenant name.
    */
   get Tenant() {
-    return this.als.getStore()?.tenantSchema;
+    return this.Store?.tenantSchema;
+  }
+
+  /**
+   * Return idempotency key.
+   */
+  get IdempotencyKey() {
+    return this.Store?.idempotencyKey;
   }
 }

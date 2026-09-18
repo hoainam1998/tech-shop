@@ -1,7 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
+import { UUID } from 'crypto';
 import { PrismaClient } from 'generated/prisma/tech-shop';
 import { Prisma, LogType, log } from 'generated/prisma/event-source';
-import { EVENT_NAME, TENANT_NAME } from './enums';
+import { EVENT_NAME, REQUEST_HANDLING_STATUS, TENANT_NAME } from './enums';
 import AlsService from './libs/als/als.service';
 
 export type EventPatternType = { cmd: string };
@@ -70,6 +71,13 @@ export type AsyncLoggingJobData = Omit<LoggingJobData, 'payload'> & {
 export type MailingJobData = Pick<Prisma.logCreateInput, 'type' | 'payload' | 'func' | 'message'> &
   Pick<log, 'user_requested' | 'context' | 'file' | 'at'>;
 
-export type AsyncLocalStore = {
+export type AsyncLocalStore = Partial<{
   tenantSchema: TENANT_NAME;
+  idempotencyKey: UUID;
+}>;
+
+export type IdempotencyResponseType = {
+  statusCode: HttpStatus;
+  status: REQUEST_HANDLING_STATUS;
+  response: Record<string, any>;
 };
