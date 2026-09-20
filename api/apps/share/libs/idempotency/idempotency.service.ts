@@ -1,6 +1,6 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IdempotencyTTL, META_NAME } from '@share/decorators/idempotency';
+import { IdempotencyTTL, META_NAME } from '@share/decorators/idempotency.decorator';
 import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
 import { IdempotencyOptionType } from './idempotency.module';
 

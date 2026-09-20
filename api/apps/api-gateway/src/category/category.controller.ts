@@ -10,7 +10,7 @@ import messages from '@share/constants/messages';
 import { MessageResponseType } from '@share/interfaces';
 import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
 import IdempotencyInterceptor from '@share/interceptors/idempotency.interceptor';
-import { IdempotencyTTL } from '@share/decorators/idempotency';
+import { IdempotencyTTL } from '@share/decorators/idempotency.decorator';
 import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
 import CategoryService from './category.service';
 

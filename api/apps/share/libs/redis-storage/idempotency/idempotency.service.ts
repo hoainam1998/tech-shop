@@ -5,7 +5,14 @@ import { REQUEST_HANDLING_STATUS } from '@share/enums';
 import { IdempotencyResponseType } from '@share/interfaces';
 import { createMessage } from '@share/utils';
 import messages from '@share/constants/messages';
-import ConsoleLogging from '../logging/console-logging';
+import ConsoleLogging from '@share/libs/logging/console-logging';
+
+/**
+ * Append redis prefix with idempotency key.
+ * @param {string} idempotencyKey - The idempotency key.
+ * @returns {string} - The redis idempotency key.
+ */
+const getRedisIdempotencyKey = (idempotencyKey: string) => `idempotency_key:${idempotencyKey}`;
 
 // Type "current_file + Enter"
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
@@ -26,9 +33,11 @@ export default class IdempotencyRepository {
    * @returns
    */
   saveIfNotExist(idempotencyKey: string, expire: number) {
+    const redisIdempotencyKey = getRedisIdempotencyKey(idempotencyKey);
+
     return this.redisClient.Client.multi()
       .json.set(
-        idempotencyKey,
+        redisIdempotencyKey,
         '$',
         {
           response: createMessage(messages.COMMON.REQUEST_HANDLING),
@@ -37,7 +46,7 @@ export default class IdempotencyRepository {
         },
         { condition: 'NX' },
       )
-      .expire(idempotencyKey, expire)
+      .expire(redisIdempotencyKey, expire)
       .exec()
       .catch((error: Error) => {
         this.consoleLog.error(error.message);
@@ -52,10 +61,12 @@ export default class IdempotencyRepository {
    * @returns
    */
   update(idempotencyKey: string, response: IdempotencyResponseType) {
-    return this.redisClient.Client.json.set(idempotencyKey, '$', response).catch((error: Error) => {
-      this.consoleLog.error(error.message);
-      throw error;
-    });
+    return this.redisClient.Client.json
+      .set(getRedisIdempotencyKey(idempotencyKey), '$', response)
+      .catch((error: Error) => {
+        this.consoleLog.error(error.message);
+        throw error;
+      });
   }
 
   /**
@@ -64,7 +75,7 @@ export default class IdempotencyRepository {
    * @param {number} expire - The expire time.
    */
   updateExpire(idempotencyKey: string, expire: number): void {
-    void this.redisClient.Client.expire(idempotencyKey, expire, 'XX').catch((error: Error) => {
+    void this.redisClient.Client.expire(getRedisIdempotencyKey(idempotencyKey), expire, 'XX').catch((error: Error) => {
       this.consoleLog.error(error.message);
       throw error;
     });
@@ -77,7 +88,7 @@ export default class IdempotencyRepository {
    */
   find(idempotencyKey: string): Promise<IdempotencyResponseType | undefined> {
     return this.redisClient.Client.json
-      .get(idempotencyKey)
+      .get(getRedisIdempotencyKey(idempotencyKey))
       .then((data) => {
         if (data) {
           return data as IdempotencyResponseType;
