@@ -1,7 +1,7 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { map } from 'rxjs';
 import AlsService from '@share/libs/als/als.service';
-import IdempotencyRepository from '@share/libs/redis-storage/idempotency.service';
+import IdempotencyRepository from '@share/libs/redis-storage/idempotency/idempotency.service';
 import { REQUEST_HANDLING_STATUS } from '@share/enums';
 import IdempotencyService from '@share/libs/idempotency/idempotency.service';
 
