@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseInterceptors, UseGuards } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { instanceToPlain } from 'class-transformer';
@@ -11,7 +11,9 @@ import { MessageResponseType } from '@share/interfaces';
 import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
 import IdempotencyInterceptor from '@share/interceptors/idempotency.interceptor';
 import { IdempotencyTTL } from '@share/decorators/idempotency.decorator';
-import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
+import { RateLimit } from '@share/decorators/rate-limiting.decorator';
+import { IDEMPOTENCY_OPTION_NAME, RATE_LIMITING_OPTION_NAME, THROTTLER_OPTION_NAME } from '@share/enums';
+import RateLimitingGuard from '@share/guards/rate-limiting.guard';
 import CategoryService from './category.service';
 
 // Type "current_file + Enter"
@@ -20,6 +22,7 @@ import CategoryService from './category.service';
 // Using __filename only reference file complied!
 const currentFilePath = import.meta.url as URL;
 
+@UseGuards(RateLimitingGuard)
 @UseInterceptors(IdempotencyInterceptor)
 @Controller(CategoryRouter.BaseUrl)
 export default class CategoryController {
@@ -47,11 +50,17 @@ export default class CategoryController {
   @HttpCode(HttpStatus.OK)
   @Post(CategoryRouter.AllCategories.Relative)
   @HandleHttpError
+  @RateLimit(RATE_LIMITING_OPTION_NAME.LESS, {
+    [THROTTLER_OPTION_NAME.SHORT]: { limit: 10 },
+  })
   getAllCategories(@Body() select: CategorySelect) {
     return this.categoryService.getAllCategories(instanceToPlain(select));
   }
 
   @IdempotencyTTL(IDEMPOTENCY_OPTION_NAME.SHORT)
+  @RateLimit(RATE_LIMITING_OPTION_NAME.LESS, {
+    [THROTTLER_OPTION_NAME.SHORT]: { limit: 10 },
+  })
   @Get('test')
   test() {
     return 'ok';
