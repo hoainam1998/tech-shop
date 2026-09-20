@@ -41,6 +41,10 @@ type ServiceHost = {
   CATEGORY_MICROSERVICE_TCP_HOST: string;
 };
 
+type RateLimitingConfig = {
+  THROTTLE_LIMIT: number;
+};
+
 @Injectable()
 export default class ENVService {
   constructor(private readonly configService: ConfigService) {}
@@ -124,6 +128,12 @@ export default class ENVService {
       SMPT_APP_PASS: this.get<string>('mail.SMPT_APP_PASS'),
       EMAIL_TEMPLATES: this.get<string>('mail.EMAIL_TEMPLATES'),
       SYSTEM_ADMIN_EMAIL: this.get<string>('mail.SYSTEM_ADMIN_EMAIL'),
+    };
+  }
+
+  get RateLimiting(): RateLimitingConfig {
+    return {
+      THROTTLE_LIMIT: parseInt(this.get<string>('throttle.THROTTLE_LIMIT')),
     };
   }
 }

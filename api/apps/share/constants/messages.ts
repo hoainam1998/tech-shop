@@ -5,7 +5,7 @@ export default Object.freeze({
     IMAGE_IS_NOT_SVG: '{fieldname} is not svg file!',
     MODULE_DISCONNECT: 'The module require is disconnect!',
     COMMON_ERROR: 'Something have broken. Please try again!',
-    THROTTLER_ERROR: 'Too many requests in a second!',
+    THROTTLER_ERROR: 'Too many requests!',
     MISS_TENANT: 'Tenant-Id header is missing!',
     INVALID_TENANT: 'Tenant-Id is invalid!',
     REQUEST_HANDLING: 'Your request are handling!',

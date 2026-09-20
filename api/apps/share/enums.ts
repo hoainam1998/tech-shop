@@ -52,3 +52,14 @@ export enum IDEMPOTENCY_OPTION_NAME {
   MEDIUM = 'medium',
   SHORT = 'short',
 }
+
+export enum RATE_LIMITING_OPTION_NAME {
+  MEDIUM = 'medium',
+  LESS = 'less',
+}
+
+export enum THROTTLER_OPTION_NAME {
+  LONG = 'long',
+  MEDIUM = 'medium',
+  SHORT = 'short',
+}
