@@ -36,6 +36,7 @@ jobs:
       # Step 3: Create .env file.
       - name: Create .env file
         run: |
+          echo "LOCALHOST=${{ secrets.LOCALHOST }}" >> .env
           echo "API_PORT=${{ secrets.API_PORT }}" >> .env
           echo "USER_MICROSERVICE_TCP_PORT=${{ secrets.USER_MICROSERVICE_TCP_PORT }}" >> .env
           echo "CATEGORY_MICROSERVICE_TCP_PORT=${{ secrets.CATEGORY_MICROSERVICE_TCP_PORT }}" >> .env
