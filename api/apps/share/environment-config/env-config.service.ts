@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ENVIRONMENTS } from '@share/enums';
 
 type PortEnvConfig = {
   API_PORT: number;
@@ -66,7 +67,7 @@ export default class ENVService {
   }
 
   get IsDockerBuild() {
-    return this.NodeENV === 'docker';
+    return this.NodeENV === ENVIRONMENTS.DOCKER;
   }
 
   get ServiceHost(): ServiceHost {

@@ -63,3 +63,10 @@ export enum THROTTLER_OPTION_NAME {
   MEDIUM = 'medium',
   SHORT = 'short',
 }
+
+export enum ENVIRONMENTS {
+  DEV = 'development',
+  PRODUCTION = 'production',
+  TEST = 'test',
+  DOCKER = 'docker',
+}
