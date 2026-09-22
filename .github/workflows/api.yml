@@ -82,9 +82,12 @@ jobs:
 
       # Step 9: Verify Endpoint Response.
       - name: Verify Application Health
+        env:
+          LOCALHOST: ${{ secrets.LOCALHOST }}
+          API_PORT: ${{ secrets.API_PORT }}
         if: github.base_ref == 'master' && github.event_name == 'pull_request'
         run: |
-          curl --head --fail --retry 10 --retry-all-errors --retry-delay 2 http://localhost:5000/healthy/ || exit 1
+          curl --head --fail --retry 10 --retry-all-errors --retry-delay 2 http://${{ env.LOCALHOST }}:${{ env.API_PORT }}/healthy/ || exit 1
 
       # Step 10: Release containerization, delete volumes.
       - name: Tear Down Docker Services
