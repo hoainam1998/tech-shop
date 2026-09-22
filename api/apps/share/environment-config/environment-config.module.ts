@@ -29,7 +29,6 @@ import validate from './env.validation';
       ],
       isGlobal: true,
       expandVariables: true,
-      validate,
     }),
   ],
 })
