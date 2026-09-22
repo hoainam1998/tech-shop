@@ -11,6 +11,7 @@ import {
   redisConfig,
   bullMq,
 } from './config';
+import validate from './env.validation';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import {
       ],
       isGlobal: true,
       expandVariables: true,
+      validate,
     }),
   ],
 })

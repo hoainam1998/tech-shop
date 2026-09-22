@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ENVIRONMENTS } from '@share/enums';
 
 type PortEnvConfig = {
   API_PORT: number;
@@ -43,6 +44,7 @@ type ServiceHost = {
 
 type RateLimitingConfig = {
   THROTTLE_LIMIT: number;
+  USER_TTL: number;
 };
 
 @Injectable()
@@ -66,7 +68,7 @@ export default class ENVService {
   }
 
   get IsDockerBuild() {
-    return this.NodeENV === 'docker';
+    return this.NodeENV === ENVIRONMENTS.DOCKER;
   }
 
   get ServiceHost(): ServiceHost {
@@ -134,6 +136,7 @@ export default class ENVService {
   get RateLimiting(): RateLimitingConfig {
     return {
       THROTTLE_LIMIT: parseInt(this.get<string>('throttle.THROTTLE_LIMIT')),
+      USER_TTL: parseInt(this.get<string>('throttle.THROTTLE_TTL')),
     };
   }
 }
