@@ -84,7 +84,7 @@ jobs:
       - name: Verify Application Health
         if: github.base_ref == 'master' && github.event_name == 'pull_request'
         run: |
-          curl --head --fail --retry 30 --retry-all-errors --retry-delay 2 http://localhost:5000/healthy/ || exit 1
+          curl --head --fail --retry 30 --retry-all-errors --retry-delay 2 http://${{ secrets.LOCALHOST }}:${{ secrets.API_PORT }}/healthy/ || exit 1
 
       # Step 10: Release containerization, delete volumes.
       - name: Tear Down Docker Services
