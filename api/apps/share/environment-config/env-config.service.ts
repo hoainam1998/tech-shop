@@ -44,6 +44,7 @@ type ServiceHost = {
 
 type RateLimitingConfig = {
   THROTTLE_LIMIT: number;
+  USER_TTL: number;
 };
 
 @Injectable()
@@ -135,6 +136,7 @@ export default class ENVService {
   get RateLimiting(): RateLimitingConfig {
     return {
       THROTTLE_LIMIT: parseInt(this.get<string>('throttle.THROTTLE_LIMIT')),
+      USER_TTL: parseInt(this.get<string>('throttle.THROTTLE_TTL')),
     };
   }
 }

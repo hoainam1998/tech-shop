@@ -1,10 +1,22 @@
 import { applyDecorators } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { IsString, IsEnum, IsNumber, IsUrl, Max, Min, validateSync, IsEmail, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsNumber,
+  IsUrl,
+  Max,
+  Min,
+  validateSync,
+  IsEmail,
+  IsOptional,
+  ValidateIf,
+} from 'class-validator';
 import { ENVIRONMENTS } from '@share/enums';
 
 const AllowLocalUrl = IsUrl({ require_protocol: true, require_port: true, require_tld: false });
 const IsPort = applyDecorators(IsNumber(), Min(0), Max(65535));
+const OptionalForGitHubAction = ValidateIf((self) => self.NODE_ENV !== ENVIRONMENTS.DOCKER);
 
 class EnvironmentVariables {
   @IsOptional()
@@ -23,9 +35,11 @@ class EnvironmentVariables {
   @IsPort
   PRODUCT_MICROSERVICE_TCP_PORT!: number;
 
+  @OptionalForGitHubAction
   @AllowLocalUrl
   ADMIN_ORIGIN_CORS!: string;
 
+  @OptionalForGitHubAction
   @AllowLocalUrl
   SALE_ORIGIN_CORS!: string;
 
@@ -82,18 +96,22 @@ class EnvironmentVariables {
   @IsString()
   SNAPSHOT_TABLE_NAME!: string;
 
+  @OptionalForGitHubAction
   @IsString()
   USER!: string;
 
   @IsString()
   DATABASE_URL!: string;
 
+  @OptionalForGitHubAction
   @IsString()
   DATABASE_URL_REPLICA_ADMIN!: string;
 
+  @OptionalForGitHubAction
   @IsString()
   DATABASE_URL_REPLICA_CUSTOMER!: string;
 
+  @OptionalForGitHubAction
   @IsString()
   DATABASE_URL_REPLICA_EMPLOYEE!: string;
 
@@ -101,6 +119,11 @@ class EnvironmentVariables {
   EVENT_SOURCE_DATABASE_URL!: string;
 }
 
+/**
+ * Validate .env properties.
+ * @param {Record<string, unknown>} config - The input env properties.
+ * @returns The valid env.
+ */
 export default (config: Record<string, unknown>) => {
   const validatedConfig = plainToInstance(EnvironmentVariables, config, { enableImplicitConversion: true });
   const errors = validateSync(validatedConfig, { skipMissingProperties: false });

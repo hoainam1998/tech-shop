@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import ConsoleLogging from '@share/libs/logging/console-logging';
 import RedisClient from '@share/libs/redis-client/redis';
 import { REDIS_CLIENT } from '@share/di-token';
+import ENVService from '@share/environment-config/env-config.service';
 
 // Type "current_file + Enter"
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
@@ -22,7 +23,10 @@ const getRateLimitingTokenByIp = (ip: string) => `${RATE_LIMITING_TOKEN_KEY}:${i
 export default class RateLimitingRepository {
   private readonly consoleLog = new ConsoleLogging(RateLimitingRepository.name, currentFilePath);
 
-  constructor(@Inject(REDIS_CLIENT) private readonly redisClient: RedisClient) {}
+  constructor(
+    @Inject(REDIS_CLIENT) private readonly redisClient: RedisClient,
+    private readonly envService: ENVService,
+  ) {}
 
   /**
    * Increase rate limit token by a value.
@@ -44,10 +48,11 @@ export default class RateLimitingRepository {
    * @returns
    */
   increaseTokenWithIpBy(ip: string, amountToken: number) {
+    const ttl = this.envService.RateLimiting.USER_TTL;
     const rateLimitingTokenByIpKey = getRateLimitingTokenByIp(ip);
     return this.redisClient.Client.multi()
       .incrBy(rateLimitingTokenByIpKey, amountToken)
-      .expire(rateLimitingTokenByIpKey, 60 * 2, 'NX')
+      .expire(rateLimitingTokenByIpKey, 60 * ttl, 'NX')
       .exec()
       .catch((error: Error) => {
         this.consoleLog.error(error.message);
