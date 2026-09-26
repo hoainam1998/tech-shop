@@ -13,19 +13,24 @@ export default class RateLimitingGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    // Get api amount consume token.
-    const amountConsumeToken = this.rateLimitingService.getTokenNumber(context.getHandler());
-    // Get overall token stored in redis.
-    const currentToken = await this.rateLimitingRepository.getRateLimitingTokenKey();
-    // Check this request should pass.
-    const allowRequest = this.rateLimitingService.shouldAllowRequest(currentToken, amountConsumeToken);
-    // If that request allowed, increase overall token and specific ip token by amount consume token.
-    if (allowRequest) {
-      await this.rateLimitingRepository.increaseTokenBy(amountConsumeToken);
-      await this.rateLimitingRepository.increaseTokenWithIpBy(request.ip as string, amountConsumeToken);
-      return allowRequest;
+    const skip = this.rateLimitingService.skip(context.getHandler());
+    if (skip) {
+      return true;
+    } else {
+      const request = context.switchToHttp().getRequest();
+      // Get api amount consume token.
+      const amountConsumeToken = this.rateLimitingService.getTokenNumber(context.getHandler());
+      // Get overall token stored in redis.
+      const currentToken = await this.rateLimitingRepository.getRateLimitingTokenKey();
+      // Check this request should pass.
+      const allowRequest = this.rateLimitingService.shouldAllowRequest(currentToken, amountConsumeToken);
+      // If that request allowed, increase overall token and specific ip token by amount consume token.
+      if (allowRequest) {
+        await this.rateLimitingRepository.increaseTokenBy(amountConsumeToken);
+        await this.rateLimitingRepository.increaseTokenWithIpBy(request.ip as string, amountConsumeToken);
+        return allowRequest;
+      }
+      throw new RateLimitingException(createMessages(messages.COMMON.THROTTLER_ERROR));
     }
-    throw new RateLimitingException(createMessages(messages.COMMON.THROTTLER_ERROR));
   }
 }

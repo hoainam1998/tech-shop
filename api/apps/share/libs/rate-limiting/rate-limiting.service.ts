@@ -1,6 +1,6 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RateLimitingToken } from '@share/decorators/rate-limiting.decorator';
+import { RateLimitingToken, META_NAME } from '@share/decorators/rate-limiting.decorator';
 import { RATE_LIMITING_OPTION_NAME } from '@share/enums';
 import ENVService from '@share/environment-config/env-config.service';
 import { RateLimitingOptionType } from './rate-limiting.module';
@@ -38,5 +38,15 @@ export default class RateLimitingService {
   shouldAllowRequest(currentTokenNumber: number, amountConsumeToken: number): boolean {
     const limit = this.envService.RateLimiting.THROTTLE_LIMIT;
     return currentTokenNumber + amountConsumeToken <= limit;
+  }
+
+  /**
+   * Get skip rate limit flag value.
+   * @param {ReturnType<ExecutionContext['getHandler']>} handler - An execute context handler.
+   * @returns {boolean} - The skip flag value.
+   */
+  skip(handler: ReturnType<ExecutionContext['getHandler']>): boolean {
+    const isSkip = this.reflector.get(META_NAME, handler);
+    return isSkip === undefined ? false : isSkip;
   }
 }
