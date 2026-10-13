@@ -56,6 +56,7 @@ export type EventSourceJobData = {
 export type LoggingPayloadType = Record<string, number | string>;
 
 export type LoggingJobData = {
+  id?: UUID;
   message: string;
   func: string;
   type?: LogType;

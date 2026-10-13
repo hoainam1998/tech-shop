@@ -6,14 +6,14 @@ import Category from './category-aggregate-root';
 export default class CategoryService {
   constructor(@Inject(EVENT_STORE) private readonly eventStore: EventStore) {}
 
-  async createCategory(id: string, name: string, icon: string) {
+  async createCategory(id: string, name: string, icon: string): Promise<string> {
     const category = Category.createNew(id, name, icon);
     const categoryWithPublisher = this.eventStore.addPublisher(category);
     await categoryWithPublisher.commit();
     return category.id;
   }
 
-  async updateCategory(id: string, name: string, icon: string) {
+  async updateCategory(id: string, name: string, icon: string): Promise<void> {
     const { events, snapshot } = await this.eventStore.findWithSnapshot(Category, id);
     const category = Category.fromEvents(id, events, snapshot!);
     category.update(name, icon);

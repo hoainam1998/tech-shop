@@ -12,7 +12,7 @@ export type LoggingInfoType = Pick<log, 'context' | 'file'> & {
  */
 const upperContextName = (context: string): string => {
   if (/^([A-Z]\w+)$/.test(context) === false) {
-    return `${context.charAt(0).toUpperCase() + context.substring(0, context.length)}`;
+    return `${context.charAt(0).toUpperCase() + context.substring(1, context.length)}`;
   }
   return context;
 };
@@ -33,11 +33,11 @@ export default abstract class Logging {
   protected get Info(): LoggingInfoType {
     return {
       context: this.Context,
-      file: this.file.toString(),
+      file: this.file.href,
     };
   }
 
-  abstract error(...params: (string | LoggingPayloadType)[]): void;
-  abstract log(...params: (string | LoggingPayloadType)[]): void;
-  abstract warn(...params: (string | LoggingPayloadType)[]): void;
+  abstract error(...params: (string | LoggingPayloadType)[]): any;
+  abstract log(...params: (string | LoggingPayloadType)[]): any;
+  abstract warn(...params: (string | LoggingPayloadType)[]): any;
 }

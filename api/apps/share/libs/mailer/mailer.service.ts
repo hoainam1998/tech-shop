@@ -1,19 +1,15 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import Mail from 'nodemailer/lib/mailer';
+import { SentMessageInfo } from 'nodemailer';
 import ENVService from '@share/environment-config/env-config.service';
 import { formatSpecificDateTime, getImagesAssetPath } from '@share/utils';
-import Mail from 'nodemailer/lib/mailer';
+import { MailingJobData } from '@share/interfaces';
 
-/**
- * Convert object of input data to json string.
- * @param object - The input data for mailing.
- */
-const convertObjToJsonString = (object: Record<string, any>): void => {
-  Object.keys(object).forEach((key) => {
-    if (typeof object[key] === 'object' && object[key] !== null) {
-      object[key] = JSON.stringify(object[key]);
-    }
-  });
+export const mailSubject = {
+  ERROR: 'Error notification!',
+  LOG: 'Information notification!',
+  WARN: 'Warning notification!',
 };
 
 const defaultAttachments = [
@@ -24,9 +20,27 @@ const defaultAttachments = [
   },
 ];
 
-const createIconSvgAttachment = (attach: Pick<Mail.Attachment, 'filename' | 'path'>): Mail.Attachment => {
+/**
+ * Convert object of input data to json string.
+ * @param object - The input data for mailing.
+ */
+const convertObjToJsonString = (object: Record<string, any>): void => {
+  Object.keys(object).forEach((key) => {
+    if (typeof object[key] === 'object' && object[key] !== null && !(object[key] instanceof Date)) {
+      object[key] = JSON.stringify(object[key]);
+    }
+  });
+};
+
+/**
+ * Create new a mail attachment with a svg image.
+ * @param filename - A svg icon file name.
+ * @returns Attachment merged.
+ */
+export const createIconSvgAttachment = (filename: string): Mail.Attachment => {
   return {
-    ...attach,
+    filename,
+    path: getImagesAssetPath(filename),
     cid: 'notificationIcon',
   };
 };
@@ -38,46 +52,58 @@ export default class MailService {
     private readonly envService: ENVService,
   ) {}
 
-  private async sendSystemEmail(
-    payload: Record<string, any>,
+  /**
+   * Send an email to system admin.
+   * @param payload - The mail payload.
+   * @param subject - A mail subject.
+   * @param attachment - A mail attachment.
+   */
+  private sendSystemEmail(
+    payload: MailingJobData,
     subject: string,
     attachment: Mail.Attachment,
-  ): Promise<void> {
+  ): Promise<SentMessageInfo> {
     convertObjToJsonString(payload);
-    payload.at = formatSpecificDateTime(payload.at as Date);
+    const sendTime = formatSpecificDateTime(payload.at);
 
-    await this.mailerService.sendMail({
+    return this.mailerService.sendMail({
       to: this.envService.Mailer.SYSTEM_ADMIN_EMAIL,
       subject,
       template: 'notification',
       context: {
-        information: payload,
+        information: { ...payload, at: sendTime },
       },
       attachments: [...defaultAttachments, attachment],
     });
   }
 
-  async sendErrorNotificationEmail(payload: Record<string, any>): Promise<void> {
-    const errorAttach = createIconSvgAttachment({
-      filename: 'error.svg',
-      path: getImagesAssetPath('error.svg'),
-    });
-    await this.sendSystemEmail(payload, 'Error notification!', errorAttach);
+  /**
+   * Send error notification email to system admin.
+   * @param payload - A mail information.
+   * @returns The promise include send email result.
+   */
+  sendErrorNotificationEmail(payload: MailingJobData): Promise<SentMessageInfo> {
+    const errorAttach = createIconSvgAttachment('error.svg');
+    return this.sendSystemEmail(payload, mailSubject.ERROR, errorAttach);
   }
 
-  async sendInfoNotificationEmail(payload: Record<string, any>): Promise<void> {
-    const infoAttach = createIconSvgAttachment({
-      filename: 'info.svg',
-      path: getImagesAssetPath('info.svg'),
-    });
-    await this.sendSystemEmail(payload, 'Information notification!', infoAttach);
+  /**
+   * Send information notification email to system admin.
+   * @param payload - A mail information.
+   * @returns The promise include send email result.
+   */
+  sendInfoNotificationEmail(payload: MailingJobData): Promise<SentMessageInfo> {
+    const infoAttach = createIconSvgAttachment('info.svg');
+    return this.sendSystemEmail(payload, mailSubject.LOG, infoAttach);
   }
 
-  async sendWarnNotificationEmail(payload: Record<string, any>): Promise<void> {
-    const warnAttach = createIconSvgAttachment({
-      filename: 'warn.svg',
-      path: getImagesAssetPath('warn.svg'),
-    });
-    await this.sendSystemEmail(payload, 'Warning notification!', warnAttach);
+  /**
+   * Send warning notification email to system admin.
+   * @param payload - A mail information.
+   * @returns The promise include send email result.
+   */
+  sendWarnNotificationEmail(payload: MailingJobData): Promise<SentMessageInfo> {
+    const warnAttach = createIconSvgAttachment('warn.svg');
+    return this.sendSystemEmail(payload, mailSubject.WARN, warnAttach);
   }
 }

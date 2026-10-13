@@ -1,22 +1,20 @@
 import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import Service from '@share/helpers/service';
-import { AsyncLoggingJobData } from '@share/interfaces';
+import { LoggingJobData } from '@share/interfaces';
 import { createMessage } from '@share/utils';
 
 type LoggingFunctionParametersType = {
   logger: Service['Logger'];
   status: HttpStatus;
-  message: string;
-  func: string;
-  payload: AsyncLoggingJobData['payload'];
+  info: Pick<LoggingJobData, 'id' | 'message' | 'func' | 'payload'>;
 };
 
 const logError = (args: LoggingFunctionParametersType): void => {
   if (args.status === HttpStatus.NOT_FOUND) {
-    void args.logger.warn({ message: args.message, func: args.func, payload: args.payload });
+    void args.logger.warn(args.info);
   } else {
-    void args.logger.error({ message: args.message, func: args.func, payload: args.payload });
+    void args.logger.error(args.info);
   }
 };
 
@@ -27,18 +25,19 @@ export default function (target: any, propertyName: string, descriptor: TypedPro
     const logger = (this as Service).Logger;
     return originMethod.apply(this, args).catch((error: any) => {
       const logInfo = {
+        id: (this as Service).id,
         message: error.message,
         func: propertyName,
-        payload: args as (string | number)[],
+        payload: args[0],
       };
 
       if (error instanceof RpcException) {
         const status = (error.getError() as any).status as HttpStatus;
-        logError({ logger, status, ...logInfo });
+        logError({ logger, status, info: logInfo });
         throw error;
       } else if (error instanceof HttpException) {
         const status = error.getStatus();
-        logError({ logger, status, ...logInfo });
+        logError({ logger, status, info: logInfo });
         throw new RpcException(error);
       } else {
         void logger.error(logInfo);

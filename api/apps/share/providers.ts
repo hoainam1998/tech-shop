@@ -1,10 +1,9 @@
 import { Provider } from '@nestjs/common';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient as TechShopPrismaClient } from 'generated/prisma/tech-shop';
 import { PrismaClient as EventSourcePrismaClient } from 'generated/prisma/event-source';
-import { REDIS_CLIENT } from './di-token';
+import { EVENT_SOURCE_PG_CONNECTOR, TECH_SHOP_PG_CONNECTOR, REDIS_CLIENT } from './di-token';
 import RedisClient from './libs/redis-client/redis';
-import { EVENT_SOURCE_PG_CONNECTOR, TECH_SHOP_PG_CONNECTOR } from '@share/di-token';
-import { PrismaPg } from '@prisma/adapter-pg';
 import ENVService from './environment-config/env-config.service';
 
 export const redisClient: Provider = {

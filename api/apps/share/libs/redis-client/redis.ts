@@ -17,7 +17,7 @@ class RedisClient {
    * Create instance.
    * @constructor
    */
-  constructor(config: ENVService) {
+  private constructor(config: ENVService) {
     this.redisClient = createClient({
       socket: {
         host: config.Redis.REDIS_SERVER_HOST,
@@ -30,7 +30,7 @@ class RedisClient {
   /**
    * Redis connect.
    */
-  connect(): void {
+  private connect(): void {
     this.redisClient
       .connect()
       .then(() => logger.log('Connect was success!'))

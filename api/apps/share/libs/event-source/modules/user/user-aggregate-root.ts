@@ -3,8 +3,8 @@ import { UserCreatedEvent, UserUpdatedEvent } from '@share/libs/event-source/eve
 
 @AggregateRootConfig({ name: 'User' })
 export default class User extends AggregateRoot {
-  private name: string;
-  private email: string;
+  private name!: string;
+  private email!: string;
 
   private constructor(id: string) {
     super(id);
@@ -24,20 +24,20 @@ export default class User extends AggregateRoot {
     return user;
   }
 
-  public update(newName: string) {
+  public update(newName: string): void {
     const event = new UserUpdatedEvent(newName);
     this.applyUserUpdatedEvent(event);
     this.append(event);
   }
 
   @ApplyEvent(UserCreatedEvent)
-  private applyUserCreatedEvent(event: UserCreatedEvent) {
+  private applyUserCreatedEvent(event: UserCreatedEvent): void {
     this.name = event.name;
     this.email = event.email;
   }
 
   @ApplyEvent(UserUpdatedEvent)
-  private applyUserUpdatedEvent(event: UserUpdatedEvent) {
+  private applyUserUpdatedEvent(event: UserUpdatedEvent): void {
     this.name = event.newName;
   }
 }

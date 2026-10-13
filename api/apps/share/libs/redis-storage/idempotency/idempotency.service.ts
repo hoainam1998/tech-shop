@@ -10,9 +10,9 @@ import ConsoleLogging from '@share/libs/logging/console-logging';
 /**
  * Append redis prefix with idempotency key.
  * @param {string} idempotencyKey - The idempotency key.
- * @returns {string} - The redis idempotency key.
+ * @returns {string} The redis idempotency key.
  */
-const getRedisIdempotencyKey = (idempotencyKey: string) => `idempotency_key:${idempotencyKey}`;
+export const getRedisIdempotencyKey = (idempotencyKey: string) => `idempotency_key:${idempotencyKey}`;
 
 // Type "current_file + Enter"
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
@@ -30,9 +30,9 @@ export default class IdempotencyRepository {
    * Save idempotency key into redis.
    * @param {string} idempotencyKey - The idempotency key.
    * @param {number} expire - The expire time.
-   * @returns
+   * @returns The promise result.
    */
-  saveIfNotExist(idempotencyKey: string, expire: number) {
+  saveIfNotExist(idempotencyKey: string, expire: number): Promise<any> {
     const redisIdempotencyKey = getRedisIdempotencyKey(idempotencyKey);
 
     return this.redisClient.Client.multi()
@@ -58,9 +58,9 @@ export default class IdempotencyRepository {
    * Update idempotency response data.
    * @param {string} idempotencyKey - The idempotency key.
    * @param {IdempotencyResponseType} response - The response data.
-   * @returns
+   * @returns The promise result.
    */
-  update(idempotencyKey: string, response: IdempotencyResponseType) {
+  updateIdempotencyResponse(idempotencyKey: string, response: IdempotencyResponseType): Promise<'OK' | null> {
     return this.redisClient.Client.json
       .set(getRedisIdempotencyKey(idempotencyKey), '$', response)
       .catch((error: Error) => {
@@ -73,12 +73,15 @@ export default class IdempotencyRepository {
    * Update expire time.
    * @param {string} idempotencyKey - The idempotency key.
    * @param {number} expire - The expire time.
+   * @returns The redis expire method return.
    */
-  updateExpire(idempotencyKey: string, expire: number): void {
-    void this.redisClient.Client.expire(getRedisIdempotencyKey(idempotencyKey), expire, 'XX').catch((error: Error) => {
-      this.consoleLog.error(error.message);
-      throw error;
-    });
+  updateExpire(idempotencyKey: string, expire: number): Promise<number> {
+    return this.redisClient.Client.expire(getRedisIdempotencyKey(idempotencyKey), expire, 'XX').catch(
+      (error: Error) => {
+        this.consoleLog.error(error.message);
+        throw error;
+      },
+    );
   }
 
   /**
@@ -86,14 +89,10 @@ export default class IdempotencyRepository {
    * @param {string} idempotencyKey - The idempotency key.
    * @returns The response data.
    */
-  find(idempotencyKey: string): Promise<IdempotencyResponseType | undefined> {
+  findIdempotencyResponse(idempotencyKey: string): Promise<IdempotencyResponseType> {
     return this.redisClient.Client.json
       .get(getRedisIdempotencyKey(idempotencyKey))
-      .then((data) => {
-        if (data) {
-          return data as IdempotencyResponseType;
-        }
-      })
+      .then((data) => data as IdempotencyResponseType)
       .catch((error: Error) => {
         this.consoleLog.error(error.message);
         throw error;

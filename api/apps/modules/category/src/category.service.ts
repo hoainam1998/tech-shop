@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Prisma, type category } from 'generated/prisma/tech-shop';
 import { PRISMA_CLIENT } from '@share/di-token';
 import type { PrismaClientReplica } from '@share/interfaces';
 import { HandlePrismaError } from '@share/decorators';
-import messages from '@share/constants/messages';
 import Service from '@share/helpers/service';
 import { ENTITY_SERVICE_NAME, EVENT_NAME } from '@share/enums';
 import CategoryEventSourceQueueService from '@share/libs/bullmq/queues/event-source/modules/category/category.service';
@@ -17,9 +16,7 @@ import CategoryCachingService from '@share/libs/bullmq/queues/caching/modules/ca
 const currentFilePath = import.meta.url as URL;
 
 @Injectable()
-export default class CategoryService extends Service {
-  public readonly messages = messages.CATEGORY;
-
+export default class CategoryService extends Service implements OnModuleDestroy {
   constructor(
     @Inject(PRISMA_CLIENT) private readonly prismaClient: PrismaClientReplica,
     private readonly categorySourceQueueService: CategoryEventSourceQueueService,
@@ -27,11 +24,11 @@ export default class CategoryService extends Service {
     private readonly categoryCaching: CategoryCachingService,
   ) {
     super(ENTITY_SERVICE_NAME.CATEGORY);
-    this.loggingService.create(this.constructor.name, currentFilePath);
+    this.initLogger(currentFilePath);
   }
 
   @HandlePrismaError()
-  createCategory(category: category): Promise<Partial<category>> {
+  createCategory(category: Pick<category, 'name' | 'icon'>): Promise<Partial<category>> {
     return this.prismaClient
       .$primary()
       .category.create({
@@ -73,5 +70,9 @@ export default class CategoryService extends Service {
         category_id: id,
       },
     });
+  }
+
+  onModuleDestroy() {
+    this.destroyLogger();
   }
 }

@@ -16,7 +16,7 @@ export default class Category extends AggregateRoot {
     super(id);
   }
 
-  static createNew(id: string, name: string, icon: string) {
+  static createNew(id: string, name: string, icon: string): Category {
     const category = new Category(id);
     const event = new CategoryCreatedEvent(name, icon);
     category.applyCategoryCreatedEvent(event);
@@ -28,7 +28,7 @@ export default class Category extends AggregateRoot {
     return { name: this.name, icon: this.icon };
   }
 
-  applySnapshot(snapshot: CategorySnapshot) {
+  applySnapshot(snapshot: CategorySnapshot): void {
     this.name = snapshot.name;
     this.icon = snapshot.icon;
   }
@@ -39,20 +39,20 @@ export default class Category extends AggregateRoot {
     return category;
   }
 
-  public update(name: string, icon: string) {
+  public update(name: string, icon: string): void {
     const event = new CategoryUpdatedEvent(name, icon);
     this.applyCategoryUpdatedEvent(event);
     this.append(event);
   }
 
   @ApplyEvent(CategoryCreatedEvent)
-  private applyCategoryCreatedEvent(event: CategoryCreatedEvent) {
+  private applyCategoryCreatedEvent(event: CategoryCreatedEvent): void {
     this.name = event.name;
     this.icon = event.icon;
   }
 
   @ApplyEvent(CategoryUpdatedEvent)
-  private applyCategoryUpdatedEvent(event: CategoryUpdatedEvent) {
+  private applyCategoryUpdatedEvent(event: CategoryUpdatedEvent): void {
     this.name = event.name;
     this.icon = event.icon;
   }

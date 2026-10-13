@@ -1,4 +1,5 @@
 import { Module, Scope } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { eventSourcePgProvider } from '@share/providers';
 import MailingModule from '@share/libs/bullmq/queues/mailing/mailing.module';
 import AsyncLoggingService from './async-logging.service';
@@ -13,7 +14,9 @@ import AsyncLoggingManager from './async-logging-manager.service';
       scope: Scope.REQUEST,
       provide: AsyncLoggingService,
       useFactory: (manager: AsyncLoggingManager) => {
-        return manager.getLogger('requestId');
+        // This is fake request id.
+        const requestId = randomUUID();
+        return manager.getLogger(requestId);
       },
       inject: [AsyncLoggingManager],
     },

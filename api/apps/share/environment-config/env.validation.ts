@@ -16,6 +16,10 @@ import { ENVIRONMENTS } from '@share/enums';
 
 const AllowLocalUrl = IsUrl({ require_protocol: true, require_port: true, require_tld: false });
 const IsPort = applyDecorators(IsNumber(), Min(0), Max(65535));
+const IsPostgresUrl = applyDecorators(
+  IsUrl({ protocols: ['postgresql'], require_protocol: true, require_port: false, require_tld: false }),
+  IsString,
+);
 const OptionalForGitHubAction = ValidateIf((self) => self.NODE_ENV !== ENVIRONMENTS.DOCKER);
 
 class EnvironmentVariables {
@@ -100,22 +104,22 @@ class EnvironmentVariables {
   @IsString()
   USER!: string;
 
-  @IsString()
+  @IsPostgresUrl
   DATABASE_URL!: string;
 
   @OptionalForGitHubAction
-  @IsString()
+  @IsPostgresUrl
   DATABASE_URL_REPLICA_ADMIN!: string;
 
   @OptionalForGitHubAction
-  @IsString()
+  @IsPostgresUrl
   DATABASE_URL_REPLICA_CUSTOMER!: string;
 
   @OptionalForGitHubAction
-  @IsString()
+  @IsPostgresUrl
   DATABASE_URL_REPLICA_EMPLOYEE!: string;
 
-  @IsString()
+  @IsPostgresUrl
   EVENT_SOURCE_DATABASE_URL!: string;
 }
 

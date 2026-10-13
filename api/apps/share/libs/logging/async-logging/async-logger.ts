@@ -1,4 +1,4 @@
-import { LogType, PrismaClient, Prisma } from 'generated/prisma/event-source';
+import { LogType, PrismaClient, Prisma, log } from 'generated/prisma/event-source';
 import type { LoggingPayloadType } from '@share/interfaces';
 import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
 import Logging from '../logging';
@@ -36,6 +36,10 @@ export default class AsyncLogging extends Logging {
     this.consoleLog = new ConsoleLogging(this.constructor.name, currentFilePath);
   }
 
+  /**
+   * Return collected base information logging.
+   * @protected
+   */
   protected get Info() {
     return {
       ...super.Info,
@@ -45,15 +49,17 @@ export default class AsyncLogging extends Logging {
 
   /**
    * Insert log into to database.
+   * @private
    * @param data - The input data.
    * @param select - The select items.
+   * @returns - The promise holding the log result.
    */
   private insertLogToDb(
     data: Pick<Prisma.logCreateInput, 'type' | 'payload' | 'func' | 'message'>,
     select?: Prisma.logSelect,
-  ): void {
+  ): Promise<log> {
     select = Object.assign(select || {}, { at: true });
-    this.db.log
+    return this.db.log
       .create({
         data: {
           ...data,
@@ -77,28 +83,31 @@ export default class AsyncLogging extends Logging {
    * @param {string} message - A message.
    * @param {string} func - A function name.
    * @param {LoggingPayloadType} payload - A parameters of parent function.
+   * @returns - The promise holding the log result.
    */
-  log(message: string, func: string, payload: LoggingPayloadType): void {
-    this.insertLogToDb({ type: LogType.INFO, payload, func, message });
+  log(message: string, func: string, payload: LoggingPayloadType): Promise<log> {
+    return this.insertLogToDb({ type: LogType.INFO, payload, func, message });
   }
 
   /**
    * Insert error message to database table.
    * @param {string} message - A message.
    * @param {string} func - A function name.
-   * @param {LoggingPayloadType} - A parameters of parent function.
+   * @param {LoggingPayloadType} payload - A parameters of parent function.
+   * @returns - The promise holding the log result.
    */
-  error(message: string, func: string, payload: LoggingPayloadType): void {
-    this.insertLogToDb({ type: LogType.ERROR, payload, func, message });
+  error(message: string, func: string, payload: LoggingPayloadType): Promise<log> {
+    return this.insertLogToDb({ type: LogType.ERROR, payload, func, message });
   }
 
   /**
    * Insert warning message to database table.
    * @param {string} message - A message.
    * @param {string} func - A function name.
-   * @param {LoggingPayloadType} - A parameters of parent function.
+   * @param {LoggingPayloadType} payload - A parameters of parent function.
+   * @returns - The promise holding the log result.
    */
-  warn(message: string, func: string, payload: LoggingPayloadType): void {
-    this.insertLogToDb({ type: LogType.WARN, payload, func, message });
+  warn(message: string, func: string, payload: LoggingPayloadType): Promise<log> {
+    return this.insertLogToDb({ type: LogType.WARN, payload, func, message });
   }
 }

@@ -1,9 +1,9 @@
 import { Module, Scope } from '@nestjs/common';
 import { PRISMA_CLIENT } from '@share/di-token';
 import AlsService from '@share/libs/als/als.service';
+import { TENANT_NAME } from '@share/enums';
 import PrismaClientManager from './prisma-client-manager.service';
 import TenantConfigService from './tenant-config.service';
-import { TENANT_NAME } from '@share/enums';
 
 @Module({
   providers: [

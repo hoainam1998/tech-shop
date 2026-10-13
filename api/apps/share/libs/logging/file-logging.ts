@@ -7,7 +7,7 @@ import { recoverLog } from './winston';
  * @class
  */
 export default class FileLogging extends Logging {
-  private logger!: winston.Logger;
+  private logger: winston.Logger;
 
   /**
    * Create file logging helper.

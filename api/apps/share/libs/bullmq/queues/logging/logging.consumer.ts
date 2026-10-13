@@ -19,8 +19,8 @@ export default class LoggingConsumer extends WorkerHost {
     super();
   }
 
-  process(job: Job<LoggingJobData>): any {
-    this.asyncLogging.write(job.data);
+  async process(job: Job<LoggingJobData>): Promise<Record<string, never>> {
+    await this.asyncLogging.write(job.data);
     return {};
   }
 }

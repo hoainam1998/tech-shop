@@ -1,4 +1,5 @@
 import { ValidateRouteUrlDecorator } from '@share/decorators';
+import { baseUrlInvalidError } from '@share/helpers/errors';
 
 /**
  * Format and split the path to absolute and relative.
@@ -73,7 +74,7 @@ export default class Router {
       this._baseUrl = url;
       Router._routes.set(this._baseUrl, this);
     } else {
-      throw new Error('Base url is invalid!');
+      throw baseUrlInvalidError;
     }
   }
 
