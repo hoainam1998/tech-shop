@@ -1,7 +1,10 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma/event-source';
+import { UUID } from 'crypto';
+import { isUUID } from 'class-validator';
 import { EVENT_SOURCE_PG_CONNECTOR } from '@share/di-token';
 import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
+import { requestIdInvalidError } from '@share/helpers/errors';
 import AsyncLoggingService from './async-logging.service';
 
 @Injectable()
@@ -15,17 +18,20 @@ export default class AsyncLoggingManager implements OnModuleDestroy {
 
   /**
    * Get existed child logger or create one if it not exist.
-   * @param {string} requestId - The logger id.
+   * @param {UUID} requestId - The logger id.
    * @returns {AsyncLoggingService} - The parent logger.
    */
-  getLogger(requestId: string): AsyncLoggingService {
-    if (this._loggers.has(requestId)) {
-      return this._loggers.get(requestId)!;
-    }
+  getLogger(requestId: UUID): AsyncLoggingService {
+    if (isUUID(requestId, '4')) {
+      if (this._loggers.has(requestId)) {
+        return this._loggers.get(requestId)!;
+      }
 
-    const logger = new AsyncLoggingService(this.eventSourceDatabase, this.mailingService);
-    this._loggers.set(requestId, logger);
-    return logger;
+      const logger = new AsyncLoggingService(this.eventSourceDatabase, this.mailingService);
+      this._loggers.set(requestId, logger);
+      return logger;
+    }
+    throw requestIdInvalidError;
   }
 
   onModuleDestroy() {

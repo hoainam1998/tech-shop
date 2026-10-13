@@ -2,12 +2,18 @@ import winston from 'winston';
 import Logging from './logging';
 import { consoleLog } from './winston';
 
+export enum CONSOLE_TYPE {
+  ERROR = 'error',
+  INFO = 'info',
+  WARN = 'warn',
+}
+
 /**
  * Console log.
  * @class
  */
 export default class ConsoleLogging extends Logging {
-  private logger!: winston.Logger;
+  private logger: winston.Logger;
 
   /**
    * Create console logging helper.
@@ -27,7 +33,7 @@ export default class ConsoleLogging extends Logging {
    * @param {string} message - The logging message.
    */
   error(message: string): void {
-    this.logger.error('error', message, this.Info);
+    this.logger.error(CONSOLE_TYPE.ERROR, message, this.Info);
   }
 
   /**
@@ -35,7 +41,7 @@ export default class ConsoleLogging extends Logging {
    * @param {string} message - The logging message.
    */
   log(message: string): void {
-    this.logger.log('info', message, this.Info);
+    this.logger.log(CONSOLE_TYPE.INFO, message, this.Info);
   }
 
   /**
@@ -43,6 +49,6 @@ export default class ConsoleLogging extends Logging {
    * @param {string} message - The logging message.
    */
   warn(message: string): void {
-    this.logger.warn('warn', message, this.Info);
+    this.logger.warn(CONSOLE_TYPE.WARN, message, this.Info);
   }
 }

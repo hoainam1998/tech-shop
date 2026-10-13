@@ -4,7 +4,7 @@ import { redisClient, techShopPgProvider } from '@share/providers';
 import { EVENT_SOURCE_BULLMQ } from '@share/di-token';
 import { QUEUE_NAME } from '@share/enums';
 import CachingConsumer from './caching.consumer';
-import CategoryService from './modules/category.service';
+import CategoryCachingService from './modules/category.service';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import CategoryService from './modules/category.service';
       name: QUEUE_NAME.CACHING,
     }),
   ],
-  providers: [CategoryService, CachingConsumer, redisClient, techShopPgProvider],
-  exports: [CategoryService],
+  providers: [CategoryCachingService, CachingConsumer, redisClient, techShopPgProvider],
+  exports: [CategoryCachingService],
 })
 export default class CachingQueueModule {}

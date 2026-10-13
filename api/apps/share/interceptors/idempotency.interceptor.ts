@@ -20,16 +20,14 @@ export default class IdempotencyInterceptor implements NestInterceptor {
       const http = context.switchToHttp();
       const res = http.getResponse();
       const httpCode = res.statusCode;
-
       const idempotencyKey = this.alsService.IdempotencyKey as string;
-      const idempotencyModel = await this.idempotencyRepository.find(idempotencyKey);
-
+      const idempotencyModel = await this.idempotencyRepository.findIdempotencyResponse(idempotencyKey);
       const ttl = this.idempotencyService.getTTL(context.getHandler());
 
       if (idempotencyModel) {
         const { status, statusCode, response } = idempotencyModel;
         if (status === REQUEST_HANDLING_STATUS.IN_PROGRESS) {
-          this.idempotencyRepository.updateExpire(idempotencyKey, ttl);
+          await this.idempotencyRepository.updateExpire(idempotencyKey, ttl);
         }
         return res.status(statusCode).json(response);
       }
@@ -38,7 +36,7 @@ export default class IdempotencyInterceptor implements NestInterceptor {
 
       return next.handle().pipe(
         map(async (data) => {
-          await this.idempotencyRepository.update(idempotencyKey, {
+          await this.idempotencyRepository.updateIdempotencyResponse(idempotencyKey, {
             statusCode: httpCode,
             status: REQUEST_HANDLING_STATUS.DONE,
             response: data,

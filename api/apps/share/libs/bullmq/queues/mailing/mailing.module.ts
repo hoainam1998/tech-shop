@@ -4,7 +4,7 @@ import { EVENT_SOURCE_BULLMQ } from '@share/di-token';
 import { QUEUE_NAME } from '@share/enums';
 import MailModule from '@share/libs/mailer/mailer.module';
 import MailingConsumer from './mailing.cusumer';
-import MailingService from './mailing.service';
+import MailingQueueService from './mailing.service';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import MailingService from './mailing.service';
     }),
     MailModule,
   ],
-  providers: [MailingConsumer, MailingService],
-  exports: [MailingService],
+  providers: [MailingConsumer, MailingQueueService],
+  exports: [MailingQueueService],
 })
 export default class MailingModule {}

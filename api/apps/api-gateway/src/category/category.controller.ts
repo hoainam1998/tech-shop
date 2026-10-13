@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseInterceptors, UseGuards } from '@nestjs/common';
-import { Observable, map } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Observable, map } from 'rxjs';
 import { instanceToPlain } from 'class-transformer';
 import CategoryRouter from '@share/router/category';
 import { UploadSvgImage, HandleHttpError } from '@share/decorators';
@@ -12,8 +12,14 @@ import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
 import IdempotencyInterceptor from '@share/interceptors/idempotency.interceptor';
 import { IdempotencyTTL } from '@share/decorators/idempotency.decorator';
 import { RateLimit } from '@share/decorators/rate-limiting.decorator';
-import { IDEMPOTENCY_OPTION_NAME, RATE_LIMITING_OPTION_NAME, THROTTLER_OPTION_NAME } from '@share/enums';
+import {
+  IDEMPOTENCY_OPTION_NAME,
+  RATE_LIMITING_OPTION_NAME,
+  THROTTLER_OPTION_NAME,
+  ENTITY_SERVICE_NAME,
+} from '@share/enums';
 import RateLimitingGuard from '@share/guards/rate-limiting.guard';
+import Service from '@share/helpers/service';
 import CategoryService from './category.service';
 
 // Type "current_file + Enter"
@@ -25,12 +31,13 @@ const currentFilePath = import.meta.url as URL;
 @UseGuards(RateLimitingGuard)
 @UseInterceptors(IdempotencyInterceptor)
 @Controller(CategoryRouter.BaseUrl)
-export default class CategoryController {
+export default class CategoryController extends Service {
   constructor(
     private readonly categoryService: CategoryService,
-    private readonly loggingService: LoggingService,
+    protected readonly loggingService: LoggingService,
   ) {
-    this.loggingService.create(this.constructor.name, currentFilePath);
+    super(ENTITY_SERVICE_NAME.CATEGORY);
+    this.initLogger(currentFilePath);
   }
 
   @HttpCode(HttpStatus.CREATED)

@@ -2,6 +2,8 @@ import winston from 'winston';
 import { WinstonModule } from 'nest-winston';
 import { formatCurrentDateTime } from '@share/utils';
 
+const TIMESTAMP_FORMAT = { format: 'YYYY-MM-DD HH:mm:ss' };
+
 const ignoreTestEnv = winston.format((info) => {
   if (process.env.NODE_ENV === 'test') {
     return false;
@@ -18,7 +20,7 @@ const colorRender = winston.format.colorize();
 
 const format = winston.format.combine(
   ignoreTestEnv(),
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.timestamp(TIMESTAMP_FORMAT),
   winston.format.json(),
 );
 
@@ -28,7 +30,7 @@ export const mainLog = WinstonModule.createLogger({
     // 1. Colorized console transport for local development
     new winston.transports.Console({
       format: winston.format.combine(
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.timestamp(TIMESTAMP_FORMAT),
         winston.format.ms(),
         winston.format.colorize({ all: true }),
         winston.format.printf(({ timestamp, level, message, context, ms }: any): string => {
@@ -50,7 +52,7 @@ export const mainLog = WinstonModule.createLogger({
 export const consoleLog = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp(TIMESTAMP_FORMAT),
     winston.format.colorize(),
     winston.format.printf(({ timestamp, level, message, context }: any): string => {
       const timestampStr = colorRender.colorize('timestamp', timestamp as string);

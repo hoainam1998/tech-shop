@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { EventNestPostgreSQLModule, PostgreSQLModuleOptions } from '@event-nest/postgresql';
 import { ForCountSnapshotStrategy } from '@event-nest/core';
-import UserEventSourceService from './modules/user/user.service';
 import ENVService from '@share/environment-config/env-config.service';
 import CategoryEventSourceService from './modules/category/category.service';
+import UserEventSourceService from './modules/user/user.service';
 
 @Module({
   imports: [

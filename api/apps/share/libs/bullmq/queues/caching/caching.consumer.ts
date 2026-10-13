@@ -3,7 +3,7 @@ import { Job } from 'bullmq';
 import { category } from 'generated/prisma/tech-shop';
 import { QUEUE_NAME, ENTITY_SERVICE_NAME } from '@share/enums';
 import ConsoleLogging from '@share/libs/logging/console-logging';
-import CategoryService from './modules/category.service';
+import CategoryCachingService from './modules/category.service';
 
 type CachingJobDataType = {
   name: ENTITY_SERVICE_NAME;
@@ -20,18 +20,19 @@ const currentFilePath = import.meta.url as URL;
 export default class CachingConsumer extends WorkerHost {
   protected logger: ConsoleLogging;
 
-  constructor(private readonly categoryService: CategoryService) {
+  constructor(private readonly categoryService: CategoryCachingService) {
     super();
     this.logger = new ConsoleLogging(this.constructor.name, currentFilePath);
   }
 
-  process(job: Job<CachingJobDataType>): any {
+  async process(job: Job<CachingJobDataType>): Promise<Record<string, never>> {
     switch (job.data.name) {
       case ENTITY_SERVICE_NAME.CATEGORY:
-        this.categoryService.setItems(job.data.payload);
+        await this.categoryService.setItems(job.data.payload);
         break;
       default:
-        return {};
+        break;
     }
+    return {};
   }
 }

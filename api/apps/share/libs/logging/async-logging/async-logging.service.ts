@@ -1,6 +1,7 @@
 import { PrismaClient, LogType } from 'generated/prisma/event-source';
 import MailingService from '@share/libs/bullmq/queues/mailing/mailing.service';
 import { LoggingJobData } from '@share/interfaces';
+import { logTypeInvalidError, loggerNotDefinedError } from '@share/helpers/errors';
 import AsyncLogger from './async-logger';
 
 /**
@@ -20,32 +21,34 @@ export default class AsyncLoggingService {
 
   /**
    * Create an async logger (child logger).
+   * @private
    * @param {string} context - The logging context.
    * @param {URL} file - The current file.
    * @returns {AsyncLogger} The async logger.
    */
-  create(context: string, file: URL): AsyncLogger | undefined {
+  private create(context: string, file: URL): AsyncLogger {
     return new AsyncLogger(this.eventSourceDatabase, this.mailingService, context, file, {});
   }
 
   /**
    * Write log to database.
-   * @param {LoggingJobData} job - A job data.
+   * @param job - A job data.
+   * @return The result process logging.
    */
-  write(job: LoggingJobData): void {
+  write(job: LoggingJobData): Promise<any> {
     const logger = this.create(job.context!, job.file!);
-    switch (job.type) {
-      case LogType.INFO:
-        logger?.log(job.message, job.func, job.payload);
-        break;
-      case LogType.ERROR:
-        logger?.error(job.message, job.func, job.payload);
-        break;
-      case LogType.WARN:
-        logger?.warn(job.message, job.func, job.payload);
-        break;
-      default:
-        break;
+    if (logger) {
+      switch (job.type) {
+        case LogType.INFO:
+          return logger.log(job.message, job.func, job.payload);
+        case LogType.ERROR:
+          return logger.error(job.message, job.func, job.payload);
+        case LogType.WARN:
+          return logger.warn(job.message, job.func, job.payload);
+        default:
+          return Promise.reject(logTypeInvalidError);
+      }
     }
+    return Promise.reject(loggerNotDefinedError);
   }
 }

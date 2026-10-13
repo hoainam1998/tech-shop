@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AsyncOptions, MicroserviceOptions, Transport } from '@nestjs/microservices';
-import CategoryModule from './category.module';
 import ENVService from '@share/environment-config/env-config.service';
+import CategoryModule from './category.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<AsyncOptions<MicroserviceOptions>>(CategoryModule, {

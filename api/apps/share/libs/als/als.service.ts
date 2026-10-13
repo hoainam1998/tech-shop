@@ -20,7 +20,7 @@ export default class AlsService {
   /**
    * Return entire store data.
    */
-  get Store() {
+  private get Store() {
     return this.als.getStore();
   }
 

@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, OnModuleDestroy } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import type { category, Prisma } from 'generated/prisma/tech-shop';
 import { createCategoryPattern, getAllCategoriesPattern } from '@share/patterns';
@@ -15,19 +15,19 @@ import CategoryService from './category.service';
 const currentFilePath = import.meta.url as URL;
 
 @Controller()
-export default class CategoryController extends Service {
+export default class CategoryController extends Service implements OnModuleDestroy {
   constructor(
     private readonly categoryService: CategoryService,
     protected readonly loggingService: LoggingService,
   ) {
     super(ENTITY_SERVICE_NAME.CATEGORY);
-    this.loggingService.create(this.constructor.name, currentFilePath);
+    this.initLogger(currentFilePath);
   }
 
   @MessagePattern(createCategoryPattern)
   @DecodeMicroserviceRequestData
   @HandleServiceError
-  createCategory(data: category): Promise<Partial<category>> {
+  createCategory(data: Pick<category, 'name' | 'icon'>): Promise<Partial<category>> {
     return this.categoryService.createCategory(data);
   }
 
@@ -36,5 +36,9 @@ export default class CategoryController extends Service {
   @HandleServiceError
   getAllCategories(data: Prisma.categorySelect): Promise<Partial<category>[]> {
     return this.categoryService.getAllCategories(data);
+  }
+
+  onModuleDestroy() {
+    this.destroyLogger();
   }
 }

@@ -9,6 +9,9 @@ type PortEnvConfig = {
 
 type DatabaseConfig = {
   DATABASE_URL: string;
+  DATABASE_URL_REPLICA_ADMIN: string;
+  DATABASE_URL_REPLICA_CUSTOMER: string;
+  DATABASE_URL_REPLICA_EMPLOYEE: string;
 };
 
 type EventSourceConfig = {
@@ -87,6 +90,9 @@ export default class ENVService {
   get Database(): DatabaseConfig {
     return {
       DATABASE_URL: this.get<string>('database.DATABASE_URL'),
+      DATABASE_URL_REPLICA_ADMIN: this.get<string>('database.DATABASE_URL_REPLICA_ADMIN'),
+      DATABASE_URL_REPLICA_CUSTOMER: this.get<string>('database.DATABASE_URL_REPLICA_CUSTOMER'),
+      DATABASE_URL_REPLICA_EMPLOYEE: this.get<string>('database.DATABASE_URL_REPLICA_EMPLOYEE'),
     };
   }
 

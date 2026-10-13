@@ -19,10 +19,29 @@
     "start:prod": "node dist/apps/api/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --ignore-pattern \"**/__test__/\" --fix",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --silent=false",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/api/apps/modules/test/api/test/jest-e2e.json"
+    "test:e2e": "jest --config ./apps/api/apps/modules/test/api/test/jest-e2e.json",
+    "test:ut:bullmq.event-source.category.add-job": "jest --watch apps/share/libs/bullmq/queues/event-source/modules/category/__test__/add-job.spec.ts",
+    "test:ut:logging.async-logging.async-logger": "npm run test:watch -- apps/share/libs/logging/__test__/async-logging/async-logger.spec.ts",
+    "test:ut:logging.async-logging.async-logging": "npm run test:watch -- apps/share/libs/logging/__test__/async-logging/async-logging.spec.ts",
+    "test:ut:bullmq.logging": "npm run test:watch -- apps/share/libs/bullmq/queues/logging/__test__/logging.spec.ts",
+    "test:ut:event-source.category.create-category": "npm run test:watch -- apps/share/libs/event-source/modules/category/__test__/create-category.spec.ts",
+    "test:ut:event-source.category.update-category": "npm run test:watch -- apps/share/libs/event-source/modules/category/__test__/update-category.spec.ts",
+    "test:ut:logging.console-logging": "npm run test:watch -- apps/share/libs/logging/__test__/console-logging.spec.ts",
+    "test:ut:logging.file-logging": "npm run test:watch -- apps/share/libs/logging/__test__/file-logging.spec.ts",
+    "test:ut:mailer.send-email": "npm run test:watch -- apps/share/libs/mailer/__test__/send-email.spec.ts",
+    "test:ut:idempotency": "npm run test:watch -- apps/share/libs/idempotency/__test__/idempotency.spec.ts",
+    "test:ut:rate-limiting": "npm run test:watch -- apps/share/libs/rate-limiting/__test__/rate-limiting.spec.ts",
+    "test:ut:redis-storage.save-if-not-exist": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/save-if-not-exist.spec.ts",
+    "test:ut:redis-storage.update-idempotency-response": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/update-idempotency-response.spec.ts",
+    "test:ut:redis-storage.update-expire": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/update-expire.spec.ts",
+    "test:ut:redis-storage.find-idempotency-response": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/find-idempotency-response.spec.ts",
+    "test:ut:redis-storage": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__",
+    "test:ut:bullmq.mailing": "npm run test:watch -- apps/share/libs/bullmq/queues/mailing/__test__/mailing.spec.ts",
+    "test:ut:bullmq.caching.category": "npm run test:watch -- apps/share/libs/bullmq/queues/caching/modules/__test__/category.spec.ts",
+    "test:ut:category.create": "npm run test:watch -- apps/modules/category/src/__test__/create-category.spec.ts"
   },
   "dependencies": {
     "@event-nest/core": "^6.0.0",
@@ -34,6 +53,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/microservices": "^11.1.28",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/schedule": "^12.0.2",
     "@nestjs/serve-static": "^5.0.5",
     "@nestjs/terminus": "^12.0.0",
     "@nestjs/throttler": "^6.7.0",
@@ -47,6 +67,7 @@
     "express-xss-sanitizer": "^2.0.2",
     "handlebars": "^4.7.9",
     "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "juice": "^12.1.2",
     "nest-commander": "^3.20.1",
     "nest-winston": "^1.10.2",
@@ -62,7 +83,7 @@
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
-    "@nestjs/testing": "^11.0.1",
+    "@nestjs/testing": "^11.2.6",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.2.0",
@@ -74,40 +95,21 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
-    "jest": "^30.0.0",
+    "jest": "^30.5.2",
     "prettier": "^3.4.2",
     "prisma": "^7.9.1",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.14",
+    "ts-jest-mock-import-meta": "^1.3.2",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.20.0"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.3"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "./coverage",
-    "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/apps/"
-    ]
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": true,

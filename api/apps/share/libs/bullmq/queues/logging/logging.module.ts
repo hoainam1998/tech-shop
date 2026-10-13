@@ -4,7 +4,7 @@ import { EVENT_SOURCE_BULLMQ } from '@share/di-token';
 import { QUEUE_NAME } from '@share/enums';
 import AsyncLoggingModule from '@share/libs/logging/async-logging/async-logging.module';
 import LoggingConsumer from './logging.consumer';
-import LoggingService from './logging.service';
+import LoggingQueueService from './logging.service';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import LoggingService from './logging.service';
     }),
     AsyncLoggingModule,
   ],
-  providers: [LoggingService, LoggingConsumer],
-  exports: [LoggingService],
+  providers: [LoggingQueueService, LoggingConsumer],
+  exports: [LoggingQueueService],
 })
 export default class LoggingModule {}

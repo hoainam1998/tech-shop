@@ -23,8 +23,13 @@
     "noFallthroughCasesInSwitch": false,
     "types": ["jest", "node", "multer", "express"],
     "paths": {
-      "@share/*": ["apps/share/*"]
-    }
+      "@share/*": ["apps/share/*"],
+      "@modules/*": ["apps/modules/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "types.d.ts"
+    ],
   },
   "assets": [{ "include": "**/*.hbs" }],
   "watchAssets": true
