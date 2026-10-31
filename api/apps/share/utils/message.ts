@@ -9,7 +9,7 @@ import { MessagesType, MessageResponseType } from '@share/interfaces';
  * errorCode: string
  * }} - The message object.
  */
-export const createMessage = (message: string, errorCode?: string): MessageResponseType => {
+export const createMessage = (message: string, errorCode?: string): Omit<MessageResponseType, 'messages'> => {
   return Object.assign({ message }, errorCode ? { errorCode } : {});
 };
 

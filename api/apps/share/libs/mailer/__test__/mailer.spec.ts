@@ -26,7 +26,6 @@ const mailPayload = {
 };
 
 const sendTime = formatSpecificDateTime(mailPayload.at);
-
 const infoAttachment = createIconSvgAttachment('info.svg');
 const errorAttachment = createIconSvgAttachment('error.svg');
 const warnAttachment = createIconSvgAttachment('warn.svg');

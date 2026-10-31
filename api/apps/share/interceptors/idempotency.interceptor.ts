@@ -20,31 +20,35 @@ export default class IdempotencyInterceptor implements NestInterceptor {
       const http = context.switchToHttp();
       const res = http.getResponse();
       const httpCode = res.statusCode;
-      const idempotencyKey = this.alsService.IdempotencyKey as string;
-      const idempotencyModel = await this.idempotencyRepository.findIdempotencyResponse(idempotencyKey);
-      const ttl = this.idempotencyService.getTTL(context.getHandler());
+      const idempotencyKey = this.alsService.IdempotencyKey;
+      if (idempotencyKey) {
+        const idempotencyModel = await this.idempotencyRepository.findIdempotencyResponse(idempotencyKey);
+        const ttl = this.idempotencyService.getTTL(context.getHandler());
 
-      if (idempotencyModel) {
-        const { status, statusCode, response } = idempotencyModel;
-        if (status === REQUEST_HANDLING_STATUS.IN_PROGRESS) {
-          await this.idempotencyRepository.updateExpire(idempotencyKey, ttl);
+        if (idempotencyModel) {
+          const { status, statusCode, response } = idempotencyModel;
+          if (status === REQUEST_HANDLING_STATUS.IN_PROGRESS) {
+            await this.idempotencyRepository.updateExpire(idempotencyKey, ttl);
+          }
+          return res.status(statusCode).json(response);
         }
-        return res.status(statusCode).json(response);
+
+        await this.idempotencyRepository.saveIfNotExist(idempotencyKey, ttl);
+
+        return next.handle().pipe(
+          map(async (data) => {
+            await this.idempotencyRepository.updateIdempotencyResponse(idempotencyKey, {
+              statusCode: httpCode,
+              status: REQUEST_HANDLING_STATUS.DONE,
+              response: data,
+            });
+
+            return data;
+          }),
+        );
+      } else {
+        return next.handle();
       }
-
-      await this.idempotencyRepository.saveIfNotExist(idempotencyKey, ttl);
-
-      return next.handle().pipe(
-        map(async (data) => {
-          await this.idempotencyRepository.updateIdempotencyResponse(idempotencyKey, {
-            statusCode: httpCode,
-            status: REQUEST_HANDLING_STATUS.DONE,
-            response: data,
-          });
-
-          return data;
-        }),
-      );
     }
 
     return next.handle();

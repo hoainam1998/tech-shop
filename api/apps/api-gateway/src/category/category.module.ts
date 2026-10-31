@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ClientProvider, ClientsModule, Transport } from '@nestjs/microservices';
 import { CATEGORY_SERVICE } from '@share/di-token';
 import ENVService from '@share/environment-config/env-config.service';
-import MailModule from '@share/libs/mailer/mailer.module';
 import CategoryService from './category.service';
 import CategoryController from './category.controller';
 
@@ -23,7 +22,6 @@ import CategoryController from './category.controller';
         name: CATEGORY_SERVICE,
       },
     ]),
-    MailModule,
   ],
   providers: [CategoryService],
   controllers: [CategoryController],

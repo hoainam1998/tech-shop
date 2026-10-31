@@ -22,7 +22,8 @@ export interface IService {
 }
 
 export type MessageResponseType = {
-  message: string;
+  messages: string[];
+  message?: string;
   errorCode?: string;
 };
 
@@ -81,4 +82,9 @@ export type IdempotencyResponseType = {
   statusCode: HttpStatus;
   status: REQUEST_HANDLING_STATUS;
   response: Record<string, any>;
+};
+
+export type MessageResponseTestingType = {
+  messages: string[];
+  errorCode?: string;
 };

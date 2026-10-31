@@ -1,7 +1,7 @@
 import { BadRequestException, ParseFilePipeBuilder, UploadedFile } from '@nestjs/common';
 import messages from '@share/constants/messages';
 import { FileSizeValidationPipe, ImageTransformPipe } from '@share/pipes';
-import { createMessage } from '@share/utils/message';
+import { createMessages } from '@share/utils/message';
 
 export default function UploadImage(fieldName: string): ParameterDecorator {
   return UploadedFile(
@@ -12,10 +12,10 @@ export default function UploadImage(fieldName: string): ParameterDecorator {
         exceptionFactory: (error) => {
           if (error === 'File is required') {
             throw new BadRequestException(
-              createMessage(messages.COMMON.FILE_IS_MISSING.replace('{fieldname}', fieldName)),
+              createMessages(messages.COMMON.FILE_IS_MISSING.replace('{fieldname}', fieldName)),
             );
           }
-          throw new BadRequestException(createMessage(error));
+          throw new BadRequestException(createMessages(error));
         },
       }),
     new FileSizeValidationPipe(),
