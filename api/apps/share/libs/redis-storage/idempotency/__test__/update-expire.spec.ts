@@ -52,7 +52,7 @@ describe('updateExpire method', () => {
     expect(error).toHaveBeenCalledWith(UnknownError.message);
   });
 
-  test('updateExpire failed with an unknown error', () => {
+  test('updateExpire failed with an unknown error', (done) => {
     expect.hasAssertions();
     const error = jest.spyOn((idempotencyRepository as any).consoleLog, 'error');
     const expire = jest.spyOn(redisClient.Client, 'expire').mockImplementation(() => {
@@ -64,5 +64,6 @@ describe('updateExpire method', () => {
     expect(expire).toHaveBeenCalledTimes(1);
     expect(expire).toHaveBeenCalledWith(redisIdempotencyKey, expireTime, 'XX');
     expect(error).not.toHaveBeenCalled();
+    done();
   });
 });

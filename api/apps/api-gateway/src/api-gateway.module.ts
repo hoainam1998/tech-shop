@@ -7,9 +7,15 @@ import ShareModule from '@share/share.module';
 import { TenantMiddleware, XssMiddleware, IdempotencyMiddleware } from '@share/middlewares';
 import HealthyRouter from '@share/router/healthy';
 import StaticRouter from '@share/router/static';
-import { IDEMPOTENCY_OPTION_NAME, RATE_LIMITING_OPTION_NAME, THROTTLER_OPTION_NAME } from '@share/enums';
+import {
+  IDEMPOTENCY_OPTION_NAME,
+  RATE_LIMITING_OPTION_NAME,
+  THROTTLER_OPTION_NAME,
+  TIMEOUT_OPTION_NAME,
+} from '@share/enums';
 import IdempotencyRegisterModule from '@share/libs/idempotency/idempotency.module';
 import RateLimitingRegisterModule from '@share/libs/rate-limiting/rate-limiting.module';
+import TimeoutRegisterModule from '@share/libs/timeout/timeout.module';
 import ProductModule from './product/product.module';
 import CategoryModule from './category/category.module';
 import HealthyModule from './healthy/healthy.module';
@@ -42,6 +48,20 @@ import HealthyModule from './healthy/healthy.module';
       {
         name: RATE_LIMITING_OPTION_NAME.LESS,
         token: 1,
+      },
+    ]),
+    TimeoutRegisterModule.forRoot([
+      {
+        name: TIMEOUT_OPTION_NAME.LONG,
+        timeout: 15,
+      },
+      {
+        name: TIMEOUT_OPTION_NAME.MEDIUM,
+        timeout: 10,
+      },
+      {
+        name: TIMEOUT_OPTION_NAME.SHORT,
+        timeout: 5,
       },
     ]),
     ThrottlerModule.forRoot({

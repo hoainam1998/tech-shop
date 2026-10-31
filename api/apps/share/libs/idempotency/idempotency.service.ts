@@ -1,21 +1,27 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IdempotencyTTL, META_NAME } from '@share/decorators/idempotency.decorator';
+import { IdempotencyTTLDecorator, META_NAME } from '@share/decorators/idempotency.decorator';
 import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
-import { IdempotencyOptionType } from './idempotency.module';
+import ModuleOptionsGenerate from '@share/helpers/module-options-generate';
+
+export const MINIMUM = 10;
+export const MAXIMUM = 100;
+
+export type IdempotencyOptionType = {
+  name: IDEMPOTENCY_OPTION_NAME;
+  ttl: number;
+};
 
 @Injectable()
-export default class IdempotencyService {
+export default class IdempotencyService extends ModuleOptionsGenerate {
   private idempotencyOptions: Partial<Record<IDEMPOTENCY_OPTION_NAME, number>>;
 
   constructor(
-    private readonly options: IdempotencyOptionType[],
+    protected readonly options: IdempotencyOptionType[],
     private readonly reflector: Reflector,
   ) {
-    this.idempotencyOptions = this.options.reduce((obj, option) => {
-      obj[option.name] = option.ttl;
-      return obj;
-    }, {});
+    super();
+    this.idempotencyOptions = this.convertToKeyValueObject('ttl');
   }
 
   /**
@@ -24,8 +30,8 @@ export default class IdempotencyService {
    * @returns {number} The expire time.
    */
   getTTL(handler: ReturnType<ExecutionContext['getHandler']>): number {
-    const name = this.reflector.get(IdempotencyTTL, handler);
-    return this.idempotencyOptions[name || IDEMPOTENCY_OPTION_NAME.SHORT];
+    const name = this.reflector.get(IdempotencyTTLDecorator, handler);
+    return this.idempotencyOptions[name || IDEMPOTENCY_OPTION_NAME.SHORT] || MINIMUM;
   }
 
   /**

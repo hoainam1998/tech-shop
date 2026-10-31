@@ -24,7 +24,7 @@ const upperContextName = (context: string): string => {
  */
 export default abstract class Logging {
   protected abstract readonly context: string;
-  protected abstract readonly file: URL;
+  protected abstract readonly file: string;
 
   protected get Context(): string {
     return upperContextName(this.context);
@@ -33,7 +33,7 @@ export default abstract class Logging {
   protected get Info(): LoggingInfoType {
     return {
       context: this.Context,
-      file: this.file.href,
+      file: this.file,
     };
   }
 

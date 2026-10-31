@@ -7,6 +7,7 @@ export const databaseConfig = registerAs('database', () => ({
   DATABASE_URL_REPLICA_CUSTOMER: process.env.DATABASE_URL_REPLICA_CUSTOMER,
   DATABASE_URL_REPLICA_EMPLOYEE: process.env.DATABASE_URL_REPLICA_EMPLOYEE,
   EVENT_SOURCE_DATABASE_URL: process.env.EVENT_SOURCE_DATABASE_URL,
+  DATABASE_QUERY_TIMEOUT: process.env.DATABASE_QUERY_TIMEOUT,
 }));
 
 export const redisConfig = registerAs('redis', () => ({

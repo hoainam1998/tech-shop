@@ -11,6 +11,7 @@ export default Object.freeze({
     REQUEST_HANDLING: 'Your request are handling!',
     MISS_IDEMPOTENCY_KEY: "Header 'x-idempotency-key' is required for this request.",
     INVALID_IDEMPOTENCY_KEY: "Header 'x-idempotency-key' must be a UUID.",
+    REQUEST_TIMEOUT: 'The request is timing out!',
   },
   DATABASE: {
     DATABASE_DISCONNECT: 'Database was disconnect. Please try again!',

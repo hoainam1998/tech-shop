@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import AlsService from '@share/libs/als/als.service';
 import IdempotencyRepository from '@share/libs/redis-storage/idempotency/idempotency.service';
 import { REQUEST_HANDLING_STATUS } from '@share/enums';
@@ -21,16 +21,17 @@ export default class IdempotencyInterceptor implements NestInterceptor {
       const res = http.getResponse();
       const httpCode = res.statusCode;
       const idempotencyKey = this.alsService.IdempotencyKey;
+
       if (idempotencyKey) {
         const idempotencyModel = await this.idempotencyRepository.findIdempotencyResponse(idempotencyKey);
         const ttl = this.idempotencyService.getTTL(context.getHandler());
-
         if (idempotencyModel) {
           const { status, statusCode, response } = idempotencyModel;
           if (status === REQUEST_HANDLING_STATUS.IN_PROGRESS) {
             await this.idempotencyRepository.updateExpire(idempotencyKey, ttl);
           }
-          return res.status(statusCode).json(response);
+          res.status(statusCode);
+          return of(response);
         }
 
         await this.idempotencyRepository.saveIfNotExist(idempotencyKey, ttl);
@@ -46,11 +47,8 @@ export default class IdempotencyInterceptor implements NestInterceptor {
             return data;
           }),
         );
-      } else {
-        return next.handle();
       }
     }
-
     return next.handle();
   }
 }

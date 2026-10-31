@@ -16,6 +16,7 @@ import LoggingQueueService from '@share/libs/bullmq/queues/logging/logging.servi
 import { PRISMA_CLIENT } from '@share/di-token';
 import { queue } from '@share/test/pre-setup/mock/bullmq';
 import MockPrismaClient from './prisma';
+import AbortService from '@share/helpers/abort.service';
 
 @Injectable()
 export class MockRateLimitingGuard implements CanActivate {
@@ -31,11 +32,18 @@ export class MockIdempotencyInterceptor implements NestInterceptor {
   }
 }
 
+@Injectable()
+export class MockTimeoutInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
+    return next.handle();
+  }
+}
+
 @Global()
 @Module({
   imports: [AlsModule],
-  providers: [LoggingQueueService],
-  exports: [AlsModule, LoggingQueueService],
+  providers: [LoggingQueueService, AbortService],
+  exports: [AlsModule, LoggingQueueService, AbortService],
 })
 export class GlobalTestingModule {}
 
@@ -75,7 +83,7 @@ export class LoggingModule {}
 export class PrismaModule {}
 
 @Module({
-  imports: [EventSourceModule, LoggingModule],
-  exports: [EventSourceModule, LoggingModule],
+  imports: [EventSourceModule, LoggingModule, AlsModule],
+  exports: [EventSourceModule, LoggingModule, AlsModule],
 })
 export default class ShareModule {}

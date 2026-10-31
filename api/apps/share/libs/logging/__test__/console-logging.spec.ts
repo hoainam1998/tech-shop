@@ -12,7 +12,7 @@ describe('error method', () => {
     consoleLogging.error(message);
     expect(error).toHaveBeenCalledTimes(1);
     expect(consoleLogError).toHaveBeenCalledTimes(1);
-    expect(consoleLogError).toHaveBeenCalledWith(CONSOLE_TYPE.ERROR, message, (consoleLogging as any).Info);
+    expect(consoleLogError).toHaveBeenCalledWith(message, (consoleLogging as any).Info);
     done();
   });
 
@@ -25,7 +25,7 @@ describe('error method', () => {
     expect (() => consoleLogging.error(message)).toThrow(UnknownError);
     expect(error).toHaveBeenCalledTimes(1);
     expect(consoleLogError).toHaveBeenCalledTimes(1);
-    expect(consoleLogError).toHaveBeenCalledWith(CONSOLE_TYPE.ERROR, message, (consoleLogging as any).Info);
+    expect(consoleLogError).toHaveBeenCalledWith(message, (consoleLogging as any).Info);
     done();
   });
 });
@@ -64,7 +64,7 @@ describe('warn method', () => {
     consoleLogging.warn(message);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(consoleLogWarn).toHaveBeenCalledTimes(1);
-    expect(consoleLogWarn).toHaveBeenCalledWith(CONSOLE_TYPE.WARN, message, (consoleLogging as any).Info);
+    expect(consoleLogWarn).toHaveBeenCalledWith(message, (consoleLogging as any).Info);
     done();
   });
 
@@ -77,7 +77,7 @@ describe('warn method', () => {
     expect (() => consoleLogging.warn(message)).toThrow(UnknownError);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(consoleLogWarn).toHaveBeenCalledTimes(1);
-    expect(consoleLogWarn).toHaveBeenCalledWith(CONSOLE_TYPE.WARN, message, (consoleLogging as any).Info);
+    expect(consoleLogWarn).toHaveBeenCalledWith(message, (consoleLogging as any).Info);
     done();
   });
 });

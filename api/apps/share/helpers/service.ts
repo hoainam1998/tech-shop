@@ -32,7 +32,7 @@ export default abstract class Service {
    * Collect data to start logging.
    * @param file - The file path.
    */
-  initLogger(file: URL): void {
+  initLogger(file: string): void {
     this.id = this.loggingService.create(this.constructor.name, file);
   }
 

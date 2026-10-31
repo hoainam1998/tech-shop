@@ -23,9 +23,9 @@ const LIMIT_MINIMUM = 1;
 const isTTLRange = checkValueInRange(TTL_MINIMUM, TTL_MAXIMUM);
 const isLimitRange = checkValueInRange(LIMIT_MINIMUM, LIMIT_MAXIMUM);
 export const META_NAME = 'skip_rate_limiting';
-export const RateLimitingToken = Reflector.createDecorator<string>();
+export const RateLimitingToken = Reflector.createDecorator<RATE_LIMITING_OPTION_NAME>();
 export const SkipRateLimiting = applyDecorators(SetMetadata(META_NAME, true), SkipThrottle());
-export const RateLimit = (name: RATE_LIMITING_OPTION_NAME, throttle?: ThrottleConfigType) => {
+export default (name: RATE_LIMITING_OPTION_NAME, throttle?: ThrottleConfigType) => {
   if (!whiteListName.includes(name)) {
     throw invalidOptionValueFieldName(name, whiteListName);
   }

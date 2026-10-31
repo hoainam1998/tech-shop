@@ -26,7 +26,7 @@ export default class AsyncLoggingService {
    * @param {URL} file - The current file.
    * @returns {AsyncLogger} The async logger.
    */
-  private create(context: string, file: URL): AsyncLogger {
+  private create(context: string, file: string): AsyncLogger {
     return new AsyncLogger(this.eventSourceDatabase, this.mailingService, context, file, {});
   }
 

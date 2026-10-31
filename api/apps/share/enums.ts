@@ -64,6 +64,12 @@ export enum THROTTLER_OPTION_NAME {
   SHORT = 'short',
 }
 
+export enum TIMEOUT_OPTION_NAME {
+  LONG = 'long',
+  MEDIUM = 'medium',
+  SHORT = 'short',
+}
+
 export enum ENVIRONMENTS {
   DEV = 'development',
   PRODUCTION = 'production',

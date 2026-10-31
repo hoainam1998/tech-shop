@@ -18,11 +18,11 @@ export default class ConsoleLogging extends Logging {
   /**
    * Create console logging helper.
    * @param {string} context - The logger context.
-   * @param {URL} file - The current file.
+   * @param {string} file - The current file.
    */
   constructor(
     protected context: string,
-    protected file: URL,
+    protected file: string,
   ) {
     super();
     this.logger = consoleLog;
@@ -33,7 +33,7 @@ export default class ConsoleLogging extends Logging {
    * @param {string} message - The logging message.
    */
   error(message: string): void {
-    this.logger.error(CONSOLE_TYPE.ERROR, message, this.Info);
+    this.logger.error(message, this.Info);
   }
 
   /**
@@ -49,6 +49,6 @@ export default class ConsoleLogging extends Logging {
    * @param {string} message - The logging message.
    */
   warn(message: string): void {
-    this.logger.warn(CONSOLE_TYPE.WARN, message, this.Info);
+    this.logger.warn(message, this.Info);
   }
 }

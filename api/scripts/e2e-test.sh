@@ -1,0 +1,1 @@
+npm run test -- apps/api-gateway/src/category/__test__/create-category.spec.ts

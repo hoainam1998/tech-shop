@@ -7,6 +7,7 @@ import LoggingModule from './libs/bullmq/queues/logging/logging.module';
 import AlsModule from './libs/als/als.module';
 import IdempotencyModule from './libs/redis-storage/idempotency/idempotency.module';
 import RateLimitingModule from './libs/redis-storage/rate-limiting/rate-limiting.module';
+import AbortService from './helpers/abort.service';
 
 @Global()
 @Module({
@@ -19,7 +20,7 @@ import RateLimitingModule from './libs/redis-storage/rate-limiting/rate-limiting
     IdempotencyModule,
     RateLimitingModule,
   ],
-  providers: [ENVService],
+  providers: [ENVService, AbortService],
   exports: [
     ENVService,
     EventSourceModule,
@@ -28,6 +29,7 @@ import RateLimitingModule from './libs/redis-storage/rate-limiting/rate-limiting
     AlsModule,
     IdempotencyModule,
     RateLimitingModule,
+    AbortService,
   ],
 })
 export default class ShareModule {}

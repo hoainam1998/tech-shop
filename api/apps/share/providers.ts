@@ -19,6 +19,7 @@ export const techShopPgProvider = {
   useFactory: (envService: ENVService) => {
     const adapter = new PrismaPg({
       connectionString: envService.Database.DATABASE_URL,
+      statement_timeout: envService.Database.DATABASE_QUERY_TIMEOUT,
     });
     return new TechShopPrismaClient({ adapter });
   },
@@ -31,6 +32,7 @@ export const eventSourcePgProvider = {
     const adapter = new PrismaPg(
       {
         connectionString: envService.EventSource.EVENT_SOURCE_DATABASE_URL,
+        statement_timeout: envService.Database.DATABASE_QUERY_TIMEOUT,
       },
       {
         schema: envService.EventSource.SCHEMA_NAME,

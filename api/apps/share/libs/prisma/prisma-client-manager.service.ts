@@ -6,6 +6,7 @@ import TenantConfigService from './tenant-config.service';
 @Injectable()
 export default class PrismaClientManager implements OnModuleDestroy {
   private readonly clients: Map<string, PrismaClient | ReturnType<PrismaClient['$extends']>> = new Map();
+
   constructor(private readonly tenantConfigService: TenantConfigService) {}
 
   /**
@@ -13,12 +14,12 @@ export default class PrismaClientManager implements OnModuleDestroy {
    * @param {TENANT_NAME} tenantSchema - The tenant name.
    * @returns The PrismaClient.
    */
-  getClient(tenantSchema: TENANT_NAME): PrismaClient | ReturnType<PrismaClient['$extends']> {
+  getClient(tenantSchema: TENANT_NAME, timeout?: number): PrismaClient | ReturnType<PrismaClient['$extends']> {
     if (this.clients.has(tenantSchema)) {
       return this.clients.get(tenantSchema)!;
     }
 
-    const client = this.tenantConfigService.createExtendedClient(tenantSchema);
+    const client = this.tenantConfigService.createExtendedClient(tenantSchema, timeout);
 
     this.clients.set(tenantSchema, client);
     return client;

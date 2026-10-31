@@ -37,4 +37,40 @@ export default class AlsService {
   get IdempotencyKey() {
     return this.Store?.idempotencyKey;
   }
+
+  /**
+   * Return request timeout.
+   */
+  get Timeout() {
+    return this.Store?.timeout;
+  }
+
+  /**
+   * Return time of request received.
+   */
+  private get ReceivedAt() {
+    return this.Store?.receivedAt;
+  }
+
+  /**
+   * Return an abort signal.
+   */
+  get AbortSignal() {
+    return this.Store?.abortSignal;
+  }
+
+  /**
+   * Return remain timeout.
+   */
+  get RemainTimeout() {
+    if (this.Timeout) {
+      if (this.ReceivedAt) {
+        const timeoutValue = this.Timeout;
+        const receivedAt = this.ReceivedAt;
+        const current = Date.now();
+        return timeoutValue - (current - receivedAt);
+      }
+      return this.Timeout;
+    }
+  }
 }

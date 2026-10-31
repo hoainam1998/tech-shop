@@ -12,7 +12,7 @@ import CategoryService from './category.service';
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
 // So, I need put a comment to explain that, I write that code to reference to current file path.
 // Using __filename only reference file complied!
-const currentFilePath = import.meta.url as URL;
+const currentFilePath = import.meta.url;
 
 @Controller()
 export default class CategoryController extends Service implements OnModuleDestroy {

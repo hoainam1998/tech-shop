@@ -3,21 +3,27 @@ import { Reflector } from '@nestjs/core';
 import { RateLimitingToken, META_NAME } from '@share/decorators/rate-limiting.decorator';
 import { RATE_LIMITING_OPTION_NAME } from '@share/enums';
 import ENVService from '@share/environment-config/env-config.service';
-import { RateLimitingOptionType } from './rate-limiting.module';
+import ModuleOptionsGenerate from '@share/helpers/module-options-generate';
+
+export const MINIMUM = 1;
+export const MAXIMUM = 10;
+
+export type RateLimitingOptionType = {
+  name: RATE_LIMITING_OPTION_NAME;
+  token: number;
+};
 
 @Injectable()
-export default class RateLimitingService {
+export default class RateLimitingService extends ModuleOptionsGenerate {
   private rateLimitingOptions: Partial<Record<RATE_LIMITING_OPTION_NAME, number>>;
 
   constructor(
-    private readonly options: RateLimitingOptionType[],
+    protected readonly options: RateLimitingOptionType[],
     private readonly reflector: Reflector,
     private readonly envService: ENVService,
   ) {
-    this.rateLimitingOptions = this.options.reduce((obj, option) => {
-      obj[option.name] = option.token;
-      return obj;
-    }, {});
+    super();
+    this.rateLimitingOptions = this.convertToKeyValueObject('token');
   }
 
   /**
@@ -27,7 +33,7 @@ export default class RateLimitingService {
    */
   getTokenNumber(handler: ReturnType<ExecutionContext['getHandler']>): number {
     const name = this.reflector.get(RateLimitingToken, handler);
-    return this.rateLimitingOptions[name || RATE_LIMITING_OPTION_NAME.LESS];
+    return this.rateLimitingOptions[name || RATE_LIMITING_OPTION_NAME.LESS] || MINIMUM;
   }
 
   /**

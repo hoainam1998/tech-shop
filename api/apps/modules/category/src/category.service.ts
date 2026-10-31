@@ -8,12 +8,13 @@ import { ENTITY_SERVICE_NAME, EVENT_NAME } from '@share/enums';
 import CategoryEventSourceQueueService from '@share/libs/bullmq/queues/event-source/modules/category/category.service';
 import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
 import CategoryCachingService from '@share/libs/bullmq/queues/caching/modules/category.service';
+import AlsService from '@share/libs/als/als.service';
 
 // Type "current_file + Enter"
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
 // So, I need put a comment to explain that, I write that code to reference to current file path.
 // Using __filename only reference file complied!
-const currentFilePath = import.meta.url as URL;
+const currentFilePath = import.meta.url;
 
 @Injectable()
 export default class CategoryService extends Service implements OnModuleDestroy {
@@ -22,6 +23,7 @@ export default class CategoryService extends Service implements OnModuleDestroy 
     private readonly categorySourceQueueService: CategoryEventSourceQueueService,
     protected readonly loggingService: LoggingService,
     private readonly categoryCaching: CategoryCachingService,
+    private readonly alsService: AlsService,
   ) {
     super(ENTITY_SERVICE_NAME.CATEGORY);
     this.initLogger(currentFilePath);
@@ -36,6 +38,8 @@ export default class CategoryService extends Service implements OnModuleDestroy 
         select: {
           category_id: true,
         },
+        timeout: this.alsService.Timeout,
+        aborted: this.alsService.AbortSignal?.aborted,
       })
       .then((categoryResult) => {
         void this.categorySourceQueueService.addJob({

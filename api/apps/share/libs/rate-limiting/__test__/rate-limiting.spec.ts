@@ -1,7 +1,7 @@
 import { RATE_LIMITING_OPTION_NAME } from '@share/enums';
 import { RateLimitingToken, META_NAME } from '@share/decorators/rate-limiting.decorator';
 import { UnknownError } from '@share/test/pre-setup/mock/errors';
-import RateLimitingService from '../rate-limiting.service';
+import RateLimitingService, { MINIMUM } from '../rate-limiting.service';
 import startUp from './pre-setup';
 
 let close: () => Promise<void>;
@@ -50,6 +50,17 @@ describe('getTokenNumber method', () => {
     const get = jest.spyOn((rateLimitingService as any).reflector, 'get').mockReturnValue(undefined);
     const getTokenNumber = jest.spyOn(rateLimitingService, 'getTokenNumber');
     expect(rateLimitingService.getTokenNumber(handler)).toBe(rateLimitingOptions[RATE_LIMITING_OPTION_NAME.LESS]);
+    expect(getTokenNumber).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledWith(RateLimitingToken, getTokenNumber.mock.calls[0][0]);
+    done();
+  });
+
+  test('getTokenNumber return success when option name is unknown', (done) => {
+    expect.hasAssertions();
+    const get = jest.spyOn((rateLimitingService as any).reflector, 'get').mockReturnValue('unknown');
+    const getTokenNumber = jest.spyOn(rateLimitingService, 'getTokenNumber');
+    expect(rateLimitingService.getTokenNumber(handler)).toBe(MINIMUM);
     expect(getTokenNumber).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledWith(RateLimitingToken, getTokenNumber.mock.calls[0][0]);
