@@ -29,14 +29,17 @@ export class Route {
    * @returns {string} - The finish path.
    */
   private createRoutePath(...urls: (string | undefined)[]): string {
-    return urls.filter((url) => !!url).join('/');
+    return urls
+      .filter((url) => !!url)
+      .join('/')
+      .trim();
   }
 
   /**
    * Get absolute path.
    */
   get Absolute() {
-    return this.createRoutePath(this._baseUrl, this._url);
+    return `/${this.createRoutePath(this._baseUrl, this._url)}`;
   }
 
   /**

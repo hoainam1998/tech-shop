@@ -5,10 +5,10 @@ import { instanceToPlain } from 'class-transformer';
 import CategoryRouter from '@share/router/category';
 import { UploadSvgImage, HandleHttpError } from '@share/decorators';
 import { CreateCategory, CategorySelect } from '@share/dto/validators/category';
-import { createMessage } from '@share/utils';
+import { createMessages } from '@share/utils';
 import messages from '@share/constants/messages';
 import { MessageResponseType } from '@share/interfaces';
-import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
+import LoggingQueueService from '@share/libs/bullmq/queues/logging/logging.service';
 import IdempotencyInterceptor from '@share/interceptors/idempotency.interceptor';
 import { IdempotencyTTL } from '@share/decorators/idempotency.decorator';
 import { RateLimit } from '@share/decorators/rate-limiting.decorator';
@@ -34,7 +34,7 @@ const currentFilePath = import.meta.url as URL;
 export default class CategoryController extends Service {
   constructor(
     private readonly categoryService: CategoryService,
-    protected readonly loggingService: LoggingService,
+    protected readonly loggingService: LoggingQueueService,
   ) {
     super(ENTITY_SERVICE_NAME.CATEGORY);
     this.initLogger(currentFilePath);
@@ -51,7 +51,7 @@ export default class CategoryController extends Service {
     Object.assign(category, { icon });
     return this.categoryService
       .createCategory(category)
-      .pipe(map(() => createMessage(messages.CATEGORY.ADD_CATEGORY_SUCCESS)));
+      .pipe(map(() => createMessages(messages.CATEGORY.ADD_CATEGORY_SUCCESS)));
   }
 
   @HttpCode(HttpStatus.OK)

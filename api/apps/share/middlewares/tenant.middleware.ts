@@ -9,7 +9,7 @@ export default class TenantMiddleware implements NestMiddleware {
   constructor(private readonly als: AlsService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-    const tenantId = req.headers['x-tenant-id'] as TENANT_NAME;
+    const tenantId = req.headers['x-tenant-name'] as TENANT_NAME;
     const allowTenants = [TENANT_NAME.ADMIN, TENANT_NAME.CUSTOMER, TENANT_NAME.EMPLOYEE];
 
     if (!tenantId) {

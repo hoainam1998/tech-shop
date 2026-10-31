@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
+import { GlobalValidatePipe } from '@share/pipes';
 import { mainLog } from '@share/libs/logging/winston';
 import { HttpExceptionFilter } from '@share/exception-filter';
 import ENVService from '@share/environment-config/env-config.service';
-import { GlobalValidatePipe } from '@share/pipes';
 import ApiGatewayModule from './api-gateway.module';
 
 async function bootstrap() {
