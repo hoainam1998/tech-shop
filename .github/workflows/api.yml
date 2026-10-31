@@ -60,6 +60,7 @@ jobs:
           echo "SNAPSHOT_TABLE_NAME=${{ secrets.SNAPSHOT_TABLE_NAME }}" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "EVENT_SOURCE_DATABASE_URL=${{ secrets.EVENT_SOURCE_DATABASE_URL }}" >> .env
+          echo "DATABASE_QUERY_TIMEOUT=${{ secrets.DATABASE_QUERY_TIMEOUT }}" >> .env
 
       # Step 4: Install dependencies ignoring optionalDependencies.
       - name: Install Dependencies
