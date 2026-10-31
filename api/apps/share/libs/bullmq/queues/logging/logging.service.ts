@@ -6,6 +6,11 @@ import { LogType } from 'generated/prisma/event-source';
 import { QUEUE_NAME, JOB_NAME } from '@share/enums';
 import { LoggingPayloadType, AsyncLoggingJobData } from '@share/interfaces';
 
+type LoggerBaseInformationType = {
+  context: string;
+  file: string;
+};
+
 /**
  * Convert job payload to json.
  * @param data - The logging payload.
@@ -23,7 +28,7 @@ export const convertJobPayload = (data: AsyncLoggingJobData['payload']): Logging
 
 @Injectable()
 export default class LoggingQueueService implements OnModuleDestroy {
-  private readonly _loggers = new Map<string, any>();
+  private readonly _loggers = new Map<string, LoggerBaseInformationType>();
 
   constructor(@InjectQueue(QUEUE_NAME.LOGGING) private readonly queue: Queue) {}
 
@@ -32,7 +37,7 @@ export default class LoggingQueueService implements OnModuleDestroy {
    * @param context - The context name.
    * @param file - The file address.
    */
-  create(context: string, file: URL): UUID {
+  create(context: string, file: string): UUID {
     const id = randomUUID();
     this._loggers.set(id, { context, file });
     return id;
@@ -54,7 +59,7 @@ export default class LoggingQueueService implements OnModuleDestroy {
   private addJob(jobData: AsyncLoggingJobData): Promise<Job<any, any>> | undefined {
     if (jobData.id) {
       const payload = convertJobPayload(jobData.payload);
-      const { context, file } = this._loggers.get(jobData.id);
+      const { context, file } = this._loggers.get(jobData.id)!;
       return this.queue.add(JOB_NAME.LOGGING, Object.assign(jobData, { payload, context, file }));
     }
   }

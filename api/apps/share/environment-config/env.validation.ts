@@ -121,6 +121,10 @@ class EnvironmentVariables {
 
   @IsPostgresUrl
   EVENT_SOURCE_DATABASE_URL!: string;
+
+  @IsNumber()
+  @Min(0)
+  DATABASE_QUERY_TIMEOUT!: number;
 }
 
 /**

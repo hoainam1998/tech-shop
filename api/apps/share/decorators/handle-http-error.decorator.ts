@@ -3,6 +3,7 @@ import {
   HttpStatus,
   InternalServerErrorException,
   NotFoundException,
+  RequestTimeoutException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { catchError, isObservable } from 'rxjs';
@@ -26,11 +27,16 @@ export default function (target: any, propertyName: string, descriptor: TypedPro
                 throw new UnauthorizedException(createMessage(error.message, errorCode));
               case HttpStatus.BAD_REQUEST:
                 throw new BadRequestException(createMessage(error.message, errorCode));
+              case HttpStatus.REQUEST_TIMEOUT:
+                throw new RequestTimeoutException(createMessage(error.message));
               default:
                 if (error.code === 'ECONNREFUSED') {
                   throw new BadRequestException(createMessage(messages.COMMON.MODULE_DISCONNECT));
+                } else if (error.message.includes('Connection closed')) {
+                  throw new BadRequestException(createMessage(`${error.message}!`));
+                } else {
+                  throw new InternalServerErrorException();
                 }
-                throw new InternalServerErrorException();
             }
           }),
         );

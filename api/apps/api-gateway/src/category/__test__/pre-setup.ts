@@ -8,8 +8,9 @@ import RateLimitingGuard from '@share/guards/rate-limiting.guard';
 import IdempotencyInterceptor from '@share/interceptors/idempotency.interceptor';
 import LoggingQueueService from '@share/libs/bullmq/queues/logging/logging.service';
 import { GlobalValidatePipe } from '@share/pipes';
-import { HttpExceptionFilter } from '@share/exception-filter';
-import { GlobalTestingModule, MockIdempotencyInterceptor, MockRateLimitingGuard } from '@share/test/pre-setup/mock/modules';
+import HttpExceptionFilter  from '@share/exception-filter/http-exception.filter';
+import { GlobalTestingModule, MockIdempotencyInterceptor, MockRateLimitingGuard, MockTimeoutInterceptor } from '@share/test/pre-setup/mock/modules';
+import AlsService from '@share/libs/als/als.service';
 
 export default async (module) => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -34,6 +35,7 @@ export default async (module) => {
     })
     .compile();
   const app = moduleFixture.createNestApplication();
+  app.useGlobalInterceptors(new MockTimeoutInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(GlobalValidatePipe.getInstance());
   await app.listen(0);

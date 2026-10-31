@@ -1,4 +1,10 @@
-import { BadRequestException, HttpStatus, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  NotFoundException,
+  RequestTimeoutException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { Prisma } from 'generated/prisma/tech-shop';
 import { PRISMA_ERROR_CODE } from '@share/enums';
@@ -34,6 +40,10 @@ export default function (status?: Status) {
           case error instanceof Prisma.PrismaClientValidationError:
             throw new RpcException(new BadRequestException(msgs.DATABASE.MUTATING_DATABASE_ERROR));
           case error instanceof Prisma.PrismaClientKnownRequestError:
+            if (error.message.includes('canceling statement due to statement timeout')) {
+              throw new RpcException(new RequestTimeoutException(msgs.COMMON.REQUEST_TIMEOUT));
+            }
+
             if (error.code === PRISMA_ERROR_CODE.DO_NOT_HAVE_PERMISSION) {
               throw new RpcException(new BadRequestException(msgs.DATABASE.DO_NOT_HAVE_PERMISSION));
             } else if (error.code === PRISMA_ERROR_CODE.ALREADY_EXIST) {
@@ -51,9 +61,9 @@ export default function (status?: Status) {
               } else {
                 throw new RpcException(new NotFoundException(msgs.NOT_FOUND));
               }
+            } else {
+              throw error;
             }
-
-            throw error;
           default:
             throw error;
         }

@@ -5,13 +5,16 @@ import { category } from 'generated/prisma/tech-shop';
 import { CATEGORY_SERVICE } from '@share/di-token';
 import { createCategoryPattern, getAllCategoriesPattern } from '@share/patterns';
 import { HandleMicroserviceRequestData } from '@share/decorators';
+import { IService } from '@share/interfaces';
 import AlsService from '@share/libs/als/als.service';
+import AbortService from '@share/helpers/abort.service';
 
 @Injectable()
-export default class CategoryService {
+export default class CategoryService implements IService {
   constructor(
     @Inject(CATEGORY_SERVICE) private readonly categoryService: ClientProxy,
     readonly alsService: AlsService,
+    readonly abortService: AbortService,
   ) {}
 
   @HandleMicroserviceRequestData

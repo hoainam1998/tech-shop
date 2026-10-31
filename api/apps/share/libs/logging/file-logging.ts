@@ -16,7 +16,7 @@ export default class FileLogging extends Logging {
    */
   constructor(
     protected context: string,
-    protected file: URL,
+    protected file: string,
   ) {
     super();
     this.logger = recoverLog(super.Context);

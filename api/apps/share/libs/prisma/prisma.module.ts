@@ -1,7 +1,9 @@
 import { Module, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { PRISMA_CLIENT } from '@share/di-token';
-import AlsService from '@share/libs/als/als.service';
-import { TENANT_NAME } from '@share/enums';
+import { tenantNameIsMissingError, timeoutIsNotValidValue } from '@share/helpers/errors';
+import { TCPRequest } from '@share/interfaces';
+import { isValidTimeout } from '@share/utils';
 import PrismaClientManager from './prisma-client-manager.service';
 import TenantConfigService from './tenant-config.service';
 
@@ -12,11 +14,20 @@ import TenantConfigService from './tenant-config.service';
     {
       provide: PRISMA_CLIENT,
       scope: Scope.REQUEST,
-      useFactory: (als: AlsService, manager: PrismaClientManager) => {
-        const tenantSchema = als.Tenant as TENANT_NAME;
-        return manager.getClient(tenantSchema);
+      useFactory: (request: TCPRequest, manager: PrismaClientManager) => {
+        const tenantSchema = request.data.header.tenant;
+        const timeout = request.data.header.timeout;
+
+        if (!isValidTimeout(timeout)) {
+          throw timeoutIsNotValidValue;
+        }
+
+        if (tenantSchema) {
+          return manager.getClient(tenantSchema, timeout);
+        }
+        throw tenantNameIsMissingError;
       },
-      inject: [AlsService, PrismaClientManager],
+      inject: [REQUEST, PrismaClientManager],
     },
   ],
   exports: [PRISMA_CLIENT],

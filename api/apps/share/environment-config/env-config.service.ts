@@ -12,6 +12,7 @@ type DatabaseConfig = {
   DATABASE_URL_REPLICA_ADMIN: string;
   DATABASE_URL_REPLICA_CUSTOMER: string;
   DATABASE_URL_REPLICA_EMPLOYEE: string;
+  DATABASE_QUERY_TIMEOUT: number;
 };
 
 type EventSourceConfig = {
@@ -93,6 +94,7 @@ export default class ENVService {
       DATABASE_URL_REPLICA_ADMIN: this.get<string>('database.DATABASE_URL_REPLICA_ADMIN'),
       DATABASE_URL_REPLICA_CUSTOMER: this.get<string>('database.DATABASE_URL_REPLICA_CUSTOMER'),
       DATABASE_URL_REPLICA_EMPLOYEE: this.get<string>('database.DATABASE_URL_REPLICA_EMPLOYEE'),
+      DATABASE_QUERY_TIMEOUT: this.get<number>('database.DATABASE_QUERY_TIMEOUT'),
     };
   }
 

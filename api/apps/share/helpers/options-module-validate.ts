@@ -1,3 +1,4 @@
+import { IDEMPOTENCY_OPTION_NAME, RATE_LIMITING_OPTION_NAME, TIMEOUT_OPTION_NAME } from '@share/enums';
 import {
   duplicateOptionError,
   exceedNumberOptionCanBeRegisteredError,
@@ -5,14 +6,16 @@ import {
   valueNotInAllowedRange,
   invalidOptionValueFieldName,
   invalidTypeOfOptionValue,
+  optionsIsEmptyError,
 } from '@share/helpers/errors';
 
-type ValueFieldNameType = 'token' | 'ttl';
+export type ValueFieldNameType = 'token' | 'ttl' | 'timeout';
+export type ModuleOptionName = RATE_LIMITING_OPTION_NAME | IDEMPOTENCY_OPTION_NAME | TIMEOUT_OPTION_NAME;
 
-type ModuleOptionType = Partial<{
+export type ModuleOptionType = Partial<{
   [key in ValueFieldNameType]: number;
 }> & {
-  name: string;
+  name: ModuleOptionName;
 };
 
 type ModuleOptionValidatePropsType = {
@@ -24,9 +27,13 @@ type ModuleOptionValidatePropsType = {
   isRange: (value: number) => boolean;
 };
 
-const VALID_VALUE_FIELDNAME = ['ttl', 'token'];
+const VALID_VALUE_FIELDNAME = ['ttl', 'token', 'timeout'];
 
 export default ({ options, min, max, valueFieldName, whiteList, isRange }: ModuleOptionValidatePropsType) => {
+  if (options.length === 0) {
+    throw optionsIsEmptyError;
+  }
+
   if (!VALID_VALUE_FIELDNAME.includes(valueFieldName)) {
     throw invalidOptionValueFieldName(valueFieldName, VALID_VALUE_FIELDNAME);
   }

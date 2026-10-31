@@ -12,6 +12,7 @@ import { UnknownError, PrismaNotHavePermission, PrismaDisconnectError } from '@s
 import { createMessage } from '@share/utils';
 import messages from '@share/constants/messages';
 import LoggingService from '@share/libs/bullmq/queues/logging/logging.service';
+import AlsService from '@share/libs/als/als.service';
 import CategoryController from '@modules/category/src/category.controller';
 import CategoryService from '@modules/category/src/category.service';
 import startUp from './pre-setup';
@@ -21,6 +22,7 @@ let categoryController: CategoryController;
 let categoryService: CategoryService;
 let prismaClient: PrismaClientReplica;
 let logging: LoggingService;
+let alsService: AlsService;
 let categoryEventSourceQueueService: CategoryEventSourceQueueService;
 
 const header = {
@@ -48,6 +50,7 @@ beforeAll(async () => {
   categoryEventSourceQueueService = moduleRef.get(CategoryEventSourceQueueService);
   prismaClient = moduleRef.get(PRISMA_CLIENT);
   logging = moduleRef.get(LoggingService);
+  alsService = moduleRef.get(AlsService);
   close = () => moduleRef.close();
 });
 
@@ -82,6 +85,8 @@ describe('create category', () => {
       select: {
         category_id: true,
       },
+      timeout: alsService.Timeout,
+      aborted: alsService.AbortSignal?.aborted,
     });
     expect(addJob).toHaveBeenCalledTimes(1);
     expect(addJob).toHaveBeenLastCalledWith({
@@ -117,6 +122,8 @@ describe('create category', () => {
       select: {
         category_id: true,
       },
+      timeout: alsService.Timeout,
+      aborted: alsService.AbortSignal?.aborted,
     });
     expect(addJob).not.toHaveBeenCalled();
     expect(log).toHaveBeenCalledTimes(2);
@@ -166,6 +173,8 @@ describe('create category', () => {
       select: {
         category_id: true,
       },
+      timeout: alsService.Timeout,
+      aborted: alsService.AbortSignal?.aborted,
     });
     expect(addJob).not.toHaveBeenCalled();
     expect(log).toHaveBeenCalledTimes(2);
@@ -215,6 +224,8 @@ describe('create category', () => {
       select: {
         category_id: true,
       },
+      timeout: alsService.Timeout,
+      aborted: alsService.AbortSignal?.aborted,
     });
     expect(addJob).not.toHaveBeenCalled();
     expect(log).toHaveBeenCalledTimes(2);
@@ -266,6 +277,8 @@ describe('create category', () => {
       select: {
         category_id: true,
       },
+      timeout: alsService.Timeout,
+      aborted: alsService.AbortSignal?.aborted,
     });
     expect(addJob).toHaveBeenCalledTimes(1);
     expect(addJob).toHaveBeenLastCalledWith({

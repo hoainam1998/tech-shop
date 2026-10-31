@@ -1,3 +1,6 @@
+import { RequestTimeoutException } from '@nestjs/common';
+import messages from '@share/constants/messages';
+
 /**
  * Happen when logging type is valid or not defined!.
  */
@@ -19,9 +22,29 @@ export const baseUrlInvalidError = new Error('Base url is invalid!');
 export const tenantNameInvalidError = new Error('Tenant name is invalid!');
 
 /**
+ * Happen when tenant name is missing!
+ */
+export const tenantNameIsMissingError = new Error('Tenant name is missing!');
+
+/**
  * Happen when request ID is not UUID!
  */
 export const requestIdInvalidError = new Error('Request ID is invalid!');
+
+/**
+ * Throw when timeout value is not millisecond!
+ */
+export const timeoutIsNotValidValue = new Error('Timeout is not millisecond!');
+
+/**
+ * Custom request timeout exception!
+ */
+export const requestTimeoutException = new RequestTimeoutException(messages.COMMON.REQUEST_TIMEOUT);
+
+/**
+ * Throw when the module options is empty.
+ */
+export const optionsIsEmptyError = new Error('The module options is empty!');
 
 /**
  * Throw when there is at least one option in the option list of the module register that is a duplicate.

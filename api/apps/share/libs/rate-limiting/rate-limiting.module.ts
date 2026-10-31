@@ -4,17 +4,10 @@ import { RATE_LIMITING_OPTION_NAME } from '@share/enums';
 import ENVService from '@share/environment-config/env-config.service';
 import { checkValueInRange } from '@share/utils/';
 import optionsModuleValidate from '@share/helpers/options-module-validate';
-import RateLimitingService from './rate-limiting.service';
+import RateLimitingService, { MINIMUM, MAXIMUM, type RateLimitingOptionType } from './rate-limiting.service';
 
-const MINIMUM = 1;
-const MAXIMUM = 10;
 const isRange = checkValueInRange(MINIMUM, MAXIMUM);
-const whiteList = [RATE_LIMITING_OPTION_NAME.MEDIUM, RATE_LIMITING_OPTION_NAME.LESS];
-
-export type RateLimitingOptionType = {
-  name: RATE_LIMITING_OPTION_NAME;
-  token: number;
-};
+const whiteList = Object.values(RATE_LIMITING_OPTION_NAME);
 
 @Module({})
 export default class RateLimitingRegisterModule {

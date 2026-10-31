@@ -1,8 +1,8 @@
 import { IDEMPOTENCY_OPTION_NAME } from '@share/enums';
-import { IdempotencyTTL, META_NAME } from '@share/decorators/idempotency.decorator';
+import { IdempotencyTTLDecorator, META_NAME } from '@share/decorators/idempotency.decorator';
 import { UnknownError } from '@share/test/pre-setup/mock/errors';
 import startUp from './pre-setup';
-import IdempotencyService from '../idempotency.service';
+import IdempotencyService, { MINIMUM } from '../idempotency.service';
 
 let idempotencyService: IdempotencyService;
 let close: () => Promise<void>;
@@ -24,27 +24,40 @@ afterAll(async () => {
 const handler = jest.fn();
 
 describe('getTTL method', () => {
-  test('getTTL return success', () => {
+  test('getTTL return success', (done) => {
     expect.hasAssertions();
     const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockReturnValue(IDEMPOTENCY_OPTION_NAME.SHORT);
     const getTTL = jest.spyOn(idempotencyService, 'getTTL');
     expect(idempotencyService.getTTL(handler)).toEqual(idempotencyOptions[IDEMPOTENCY_OPTION_NAME.SHORT]);
     expect(getTTL).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
-    expect(get).toHaveBeenCalledWith(IdempotencyTTL, getTTL.mock.calls[0][0]);
+    expect(get).toHaveBeenCalledWith(IdempotencyTTLDecorator, getTTL.mock.calls[0][0]);
+    done();
   });
 
-  test('getTTL return success with option name is undefined', () => {
+  test('getTTL return success with option name is undefined', (done) => {
     expect.hasAssertions();
     const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockReturnValue(undefined);
     const getTTL = jest.spyOn(idempotencyService, 'getTTL');
     expect(idempotencyService.getTTL(handler)).toEqual(idempotencyOptions[IDEMPOTENCY_OPTION_NAME.SHORT]);
     expect(getTTL).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
-    expect(get).toHaveBeenCalledWith(IdempotencyTTL, getTTL.mock.calls[0][0]);
+    expect(get).toHaveBeenCalledWith(IdempotencyTTLDecorator, getTTL.mock.calls[0][0]);
+    done();
   });
 
-  test('getTTL failed with unknown error', () => {
+  test('getTTL return success with option name is unknown', (done) => {
+    expect.hasAssertions();
+    const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockReturnValue('unknown');
+    const getTTL = jest.spyOn(idempotencyService, 'getTTL');
+    expect(idempotencyService.getTTL(handler)).toEqual(MINIMUM);
+    expect(getTTL).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledWith(IdempotencyTTLDecorator, getTTL.mock.calls[0][0]);
+    done();
+  });
+
+  test('getTTL failed with unknown error', (done) => {
     expect.hasAssertions();
     const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockImplementation(() => {
       throw UnknownError;
@@ -53,12 +66,13 @@ describe('getTTL method', () => {
     expect(() => idempotencyService.getTTL(handler)).toThrow(UnknownError);
     expect(getTTL).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
-    expect(get).toHaveBeenCalledWith(IdempotencyTTL, getTTL.mock.calls[0][0]);
+    expect(get).toHaveBeenCalledWith(IdempotencyTTLDecorator, getTTL.mock.calls[0][0]);
+    done();
   });
 });
 
 describe('skip method', () => {
-  test('skip return success', () => {
+  test('skip return success', (done) => {
     expect.hasAssertions();
     const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockReturnValue(true);
     const skip = jest.spyOn(idempotencyService, 'skip');
@@ -66,9 +80,10 @@ describe('skip method', () => {
     expect(skip).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledWith(META_NAME, skip.mock.calls[0][0]);
+    done();
   });
 
-  test('skip return success with option name is undefined', () => {
+  test('skip return success with option name is undefined', (done) => {
     expect.hasAssertions();
     const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockReturnValue(undefined);
     const skip = jest.spyOn(idempotencyService, 'skip');
@@ -76,9 +91,10 @@ describe('skip method', () => {
     expect(skip).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledWith(META_NAME, skip.mock.calls[0][0]);
+    done();
   });
 
-  test('skip failed with unknown error', () => {
+  test('skip failed with unknown error', (done) => {
     expect.hasAssertions();
     const get = jest.spyOn((idempotencyService as any).reflector, 'get').mockImplementation(() => {
       throw UnknownError;
@@ -88,5 +104,6 @@ describe('skip method', () => {
     expect(skip).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledWith(META_NAME, skip.mock.calls[0][0]);
+    done();
   });
 });

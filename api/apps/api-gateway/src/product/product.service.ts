@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { IService } from '@share/interfaces';
 import { HandleMicroserviceRequestData } from '@share/decorators';
 import AlsService from '@share/libs/als/als.service';
+import AbortService from '@share/helpers/abort.service';
 
 @Injectable()
 export default class ProductService implements IService {
   constructor(
     // @Inject(PRODUCT_SERVICE) private readonly service: ClientProxy,
     readonly alsService: AlsService,
+    readonly abortService: AbortService,
   ) {}
 
   @HandleMicroserviceRequestData

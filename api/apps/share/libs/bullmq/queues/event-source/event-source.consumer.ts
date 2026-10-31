@@ -10,11 +10,11 @@ import ConsoleLogging from '@share/libs/logging/console-logging';
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
 // So, I need put a comment to explain that, I write that code to reference to current file path.
 // Using __filename only reference file complied!
-const currentFilePath = import.meta.url as URL;
+const currentFilePath = import.meta.url;
 
 @Processor(QUEUE_NAME.EVENT_SOURCE, { concurrency: 5 })
 export default class EventSourceQueueConsumer extends BullMqWorker {
-  protected readonly logger: ConsoleLogging = new ConsoleLogging(this.constructor.name, currentFilePath);
+  protected readonly logger: ConsoleLogging = new ConsoleLogging(EventSourceQueueConsumer.name, currentFilePath);
 
   constructor(private readonly categoryEventSource: CategoryEventSourceService) {
     super();

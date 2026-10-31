@@ -36,6 +36,7 @@
     "test:ut:mailer": "npm run test:watch -- apps/share/libs/mailer/__test__/mailer.spec.ts",
     "test:ut:idempotency": "npm run test:watch -- apps/share/libs/idempotency/__test__/idempotency.spec.ts",
     "test:ut:rate-limiting": "npm run test:watch -- apps/share/libs/rate-limiting/__test__/rate-limiting.spec.ts",
+    "test:ut:timeout": "npm run test:watch -- apps/share/libs/timeout/__test__/timeout.spec.ts",
     "test:ut:redis-storage.idempotency.save-if-not-exist": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/save-if-not-exist.spec.ts",
     "test:ut:redis-storage.idempotency.update-idempotency-response": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/update-idempotency-response.spec.ts",
     "test:ut:redis-storage.idempotency.update-expire": "npm run test:watch -- apps/share/libs/redis-storage/idempotency/__test__/update-expire.spec.ts",

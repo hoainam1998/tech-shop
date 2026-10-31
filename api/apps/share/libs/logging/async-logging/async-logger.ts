@@ -8,32 +8,31 @@ import ConsoleLogging from '../console-logging';
 // @ts-expect-error: "import.meta.url" is not allow in CommonJS.
 // So, I need put a comment to explain that, I write that code to reference to current file path.
 // Using __filename only reference file complied!
-const currentFilePath = import.meta.url as URL;
+const currentFilePath = import.meta.url;
 
 /**
  * Logging helper class.
  * @class
  */
 export default class AsyncLogging extends Logging {
-  private consoleLog?: ConsoleLogging;
+  private readonly consoleLog: ConsoleLogging = new ConsoleLogging(AsyncLogging.name, currentFilePath);
 
   /**
    * Logging system message into a database.
    * @param {PrismaClient} db - The database instance.
    * @param {MailingService} mailingService - The bullmq mailing service.
    * @param {string} context - The message context.
-   * @param {URL} file - A current file path.
+   * @param {string} file - A current file path.
    * @param {Record<string, any>} userRequested - The user requested.
    */
   constructor(
     private readonly db: PrismaClient,
     private readonly mailingService: MailingService,
     protected readonly context: string,
-    protected readonly file: URL,
+    protected readonly file: string,
     private readonly userRequested: Record<string, any>,
   ) {
     super();
-    this.consoleLog = new ConsoleLogging(this.constructor.name, currentFilePath);
   }
 
   /**
