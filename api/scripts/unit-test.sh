@@ -1,4 +1,3 @@
-
 npm run test -- apps/share/libs/bullmq/queues/event-source/modules/category/__test__
 npm run test -- apps/share/libs/logging/__test__/async-logging/async-logger.spec.ts
 npm run test -- apps/share/libs/logging/__test__/async-logging/async-logging.spec.ts
