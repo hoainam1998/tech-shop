@@ -70,21 +70,25 @@ jobs:
       - name: Generate Prisma Client
         run: bash ./scripts/db-generate.prisma.sh
 
-      # Step 6: ESLint test.
-      - name: Linting
-        run: npm run lint -- --quiet
+      # Step 6: Unit test.
+      - name: Unit testing
+        run: bash ./scripts/unit-test.sh
 
-      # Step 7: Build.
+      # Step 7: End-to-end test.
+      - name: End-to-end testing
+        run: bash ./scripts/e2e-test.sh
+
+      # Step 8: Build.
       - name: Build Application
         if: github.base_ref != 'master' && github.event_name == 'push'
         run: npm run build
 
-      # Step 8: Build Docker Image.
+      # Step 9: Build Docker Image.
       - name: Start Docker containerizing
         if: github.base_ref == 'master' && github.event_name == 'pull_request'
         run: docker compose up -d --build
 
-      # Step 9: Verify Endpoint Response.
+      # Step 10: Verify Endpoint Response.
       - name: Verify Application Health
         env:
           LOCALHOST: ${{ secrets.LOCALHOST }}
@@ -93,7 +97,7 @@ jobs:
         run: |
           curl --head --fail --retry 30 --retry-all-errors --retry-delay 2 http://${{ env.LOCALHOST }}:${{ env.API_PORT }}/healthy/ || exit 1
 
-      # Step 10: Release containerization, delete volumes.
+      # Step 11: Release containerization, delete volumes.
       - name: Tear Down Docker Services
         if: always() && github.base_ref == 'master' && github.event_name == 'pull_request'
         run: docker compose down -v
